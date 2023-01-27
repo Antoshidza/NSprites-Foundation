@@ -36,12 +36,15 @@ namespace NSprites
         }
         
         [BakeDerivedTypes]
-        private class SpriteRendererBaker : Baker<SpriteRendererAuthoringBase>
+        private class Baker : Baker<SpriteRendererAuthoringBase>
         {
             public override void Bake(SpriteRendererAuthoringBase authoring)
             {
                 var renderData = authoring.RenderData;
                 
+                if(renderData.Material == null || renderData.PropertiesSet == null)
+                    return;
+
                 DependsOn(renderData.PropertiesSet);
                 AddComponentObject(new SpriteRenderDataToRegister { data = renderData });
                 AddComponent<SpriteBakeRequest>(); // to trigger baking system

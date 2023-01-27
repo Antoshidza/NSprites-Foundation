@@ -16,6 +16,12 @@ namespace NSprites
         {
             public override void Bake(SpriteRendererAuthoring authoring)
             {
+                if (authoring._sprite == null)
+                    return;
+
+                DependsOn(authoring);
+                DependsOn(authoring._sprite);
+
                 BakeSpriteRender
                 (
                     this,
@@ -38,7 +44,7 @@ namespace NSprites
         
         [FormerlySerializedAs("_sprite")][SerializeField] protected Sprite _sprite;
         [FormerlySerializedAs("_spriteRenderData")][SerializeField] protected SpriteRenderData _spriteRenderData;
-        [FormerlySerializedAs("_overrideSpriteTexture")][SerializeField] protected bool _overrideSpriteTexture;
+        [FormerlySerializedAs("_overrideSpriteTexture")][SerializeField] protected bool _overrideSpriteTexture = true;
         [FormerlySerializedAs("ExcludeUnityTransformComponents")] [SerializeField] protected bool _excludeUnityTransformComponents = true;
         [FormerlySerializedAs("scale ")][SerializeField] protected float2 _scale = new(1f);
         [FormerlySerializedAs("_pivot ")][SerializeField] protected float2 _pivot = new(.5f);
@@ -54,6 +60,17 @@ namespace NSprites
         public static void BakeSpriteRender<TAuthoring>(Baker<TAuthoring> baker, TAuthoring authoring, in float4 mainTexST, in float2 pivot, in float2 scale, bool removeDefaultTransform = true, bool add2DTransform = true)
             where TAuthoring : MonoBehaviour
         {
+            if (baker == null)
+            {
+                Debug.LogError($"Passed baker is null");
+                return;
+            }
+            if (authoring == null)
+            {
+                Debug.LogError($"Passed authoring object is null");
+                return;
+            }
+
             baker.AddComponent(new MainTexST { value = mainTexST });
             baker.AddComponent(new Pivot { value = pivot });
             baker.AddComponent(new Scale2D { value = scale });
@@ -70,6 +87,12 @@ namespace NSprites
         public static void BakeSpriteSorting<TAuthoring>(Baker<TAuthoring> baker, int sortingIndex, int sortingLayer, bool staticSorting = false)
             where TAuthoring : MonoBehaviour
         {
+            if (baker == null)
+            {
+                Debug.LogError($"Passed baker is null");
+                return;
+            }
+            
             baker.AddComponent<VisualSortingTag>();
             baker.AddComponent<SortingValue>();
             baker.AddComponent(new SortingIndex { value = sortingIndex });
@@ -105,7 +128,7 @@ namespace NSprites
         {
             get
             {
-                if (_overrideSpriteTexture)
+                if (_overrideSpriteTexture && _sprite != null)
                     _spriteRenderData.Material = GetOrCreateOverridedMaterial(_sprite.texture);
                 return _spriteRenderData;
             }
