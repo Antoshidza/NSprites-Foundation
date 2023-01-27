@@ -10,12 +10,12 @@ Also before working with this package please read [NSprites documentation](https
 | **name**                                                                                  | **running** | description                                                            |
 |:------------------------------------------------------------------------------------------|:------------|:-----------------------------------------------------------------------|
 | [Components](https://github.com/Antoshidza/NSprites-Foundation/tree/main/Base/Components) | runtime     | Contains components to be used with NSprites                           |
-| [Render data authoring](RenderDataAuthoring.md)                                           | editor      | Bakes basic render data, uses all other parts                          |
+| [Render data authoring](About/RenderDataAuthoring.md)                                     | editor      | Bakes basic render data, uses all other parts                          |
 | Render data registration                                                                  | runtime     | Register render data for NSprites render system                        |
-| [Sorting](Sorting.md)                                                                     | runtime     | Calculate SortingValue depending on 2D position to use in shader       |
+| [Sorting](About/Sorting.md)                                                                     | runtime     | Calculate SortingValue depending on 2D position to use in shader       |
 | Culling                                                                                   | runtime     | Disables / Enables rendering based on 2D position relatively to camera |
-| [Animation](Animation.md)                                                                 | runtime     | Shifts UVs values to simulate sprite animation                         |
-| [2D Transform](2DTransform.md)                                                            | both        | Provides systems / components to simulate 2D transforms                |
+| [Animation](About/Animation.md)                                                                 | runtime     | Shifts UVs values to simulate sprite animation                         |
+| [2D Transform](About/2DTransform.md)                                                            | both        | Provides systems / components to simulate 2D transforms                |
 Diagram below illustrates dependencies between parts
 
 // TODO: place diagram through GitHub 
