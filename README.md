@@ -16,9 +16,9 @@ Also before working with this package please read [NSprites documentation](https
 | Culling                                                                                   | runtime     | Disables / Enables rendering based on 2D position relatively to camera |
 | [Animation](About/Animation.md)                                                                 | runtime     | Shifts UVs values to simulate sprite animation                         |
 | [2D Transform](About/2DTransform.md)                                                            | both        | Provides systems / components to simulate 2D transforms                |
-Diagram below illustrates dependencies between parts
 
-// TODO: place diagram through GitHub 
+Diagram below illustrates dependencies between parts
+<img src="About/NSprites-Foundation-Map.drawio.svg" width="800"/>
 
 ## Installation
 ### Requirements
