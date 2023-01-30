@@ -22,8 +22,8 @@ Diagram below illustrates dependencies between parts
 
 ## Installation
 ### Requirements
-* [NSprites v2.0.0](https://github.com/Antoshidza/NSprites)
-* Unity v2022.2+
+* [NSprites v2.1.0](https://github.com/Antoshidza/NSprites)
+* Unity v2022.2.3+
 * Entities v1.0.0-pre.15
 
 ### [Install via Package Manager](https://docs.unity3d.com/2021.3/Documentation/Manual/upm-ui-giturl.html)
