@@ -1,4 +1,3 @@
-using Unity.Burst;
 using Unity.Entities;
 using UnityEngine;
 
@@ -10,31 +9,6 @@ namespace NSprites
     /// </summary>
     public abstract class SpriteRendererAuthoringBase : MonoBehaviour
     {
-        [BurstCompile]
-        [WorldSystemFilter(WorldSystemFilterFlags.BakingSystem)]
-        private partial struct SpriteRenderBakingSystem : ISystem
-        {
-            private EntityQuery _query;
-
-            public void OnCreate(ref SystemState state)
-            {
-                _query = state.GetEntityQuery
-                (
-                    new EntityQueryDesc
-                    {
-                        All = new [] { ComponentType.ReadOnly<SpriteBakeRequest>() },
-                        Options = EntityQueryOptions.IncludePrefab
-                    }
-                );
-            }
-            public void OnDestroy(ref SystemState state) {}
-            public void OnUpdate(ref SystemState state)
-            {
-                // add sprite render components to each entity which will be registered as sprite
-                state.EntityManager.AddSpriteRenderComponents(_query);
-            }
-        }
-        
         [BakeDerivedTypes]
         private class Baker : Baker<SpriteRendererAuthoringBase>
         {
@@ -47,7 +21,7 @@ namespace NSprites
 
                 DependsOn(renderData.PropertiesSet);
                 AddComponentObject(new SpriteRenderDataToRegister { data = renderData });
-                AddComponent<SpriteBakeRequest>(); // to trigger baking system
+                this.AddSpriteRenderComponents(renderData.ID);
             }
         }
 
