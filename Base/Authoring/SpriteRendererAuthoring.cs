@@ -29,6 +29,8 @@ namespace NSprites
                     NSpritesUtils.GetTextureST(authoring._sprite),
                     authoring._pivot,
                     authoring.VisualSize,
+                    flipX: authoring._flip.x,
+                    flipY: authoring._flip.y,
                     removeDefaultTransform: authoring._excludeUnityTransformComponents
                 );
                 if(!authoring._disableSorting)
@@ -48,6 +50,7 @@ namespace NSprites
         [FormerlySerializedAs("ExcludeUnityTransformComponents")] [SerializeField] protected bool _excludeUnityTransformComponents = true;
         [FormerlySerializedAs("scale ")][SerializeField] protected float2 _scale = new(1f);
         [FormerlySerializedAs("_pivot ")][SerializeField] protected float2 _pivot = new(.5f);
+        [SerializeField] protected bool2 _flip;
         [Space]
         [FormerlySerializedAs("DisableSorting")] [Tooltip("Won't add any sorting related components")] protected bool _disableSorting;
         [FormerlySerializedAs("StaticSorting")] [Tooltip("Use it when entities exists on the same layer and never changes theirs position / sorting index / layer")] protected bool _staticSorting;
@@ -57,7 +60,7 @@ namespace NSprites
         public static float2 GetSpriteSize(Sprite sprite) => new(sprite.bounds.size.x, sprite.bounds.size.y);
         public virtual float2 VisualSize => GetSpriteSize(_sprite) * _scale;
 
-        public static void BakeSpriteRender<TAuthoring>(Baker<TAuthoring> baker, TAuthoring authoring, in float4 mainTexST, in float2 pivot, in float2 scale, bool removeDefaultTransform = true, bool add2DTransform = true)
+        public static void BakeSpriteRender<TAuthoring>(Baker<TAuthoring> baker, TAuthoring authoring, in float4 mainTexST, in float2 pivot, in float2 scale, bool flipX = false, bool flipY = false, bool removeDefaultTransform = true, bool add2DTransform = true)
             where TAuthoring : MonoBehaviour
         {
             if (baker == null)
@@ -74,6 +77,7 @@ namespace NSprites
             baker.AddComponent(new MainTexST { value = mainTexST });
             baker.AddComponent(new Pivot { value = pivot });
             baker.AddComponent(new Scale2D { value = scale });
+            baker.AddComponent(new Flip{ Value = new int2(flipX ? -1 : 0, flipY ? -1 : 0) });
             
             if(removeDefaultTransform)
                 baker.AddComponent<RemoveDefaultTransformComponentsTag>();

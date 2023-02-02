@@ -31,6 +31,8 @@ namespace NSprites
                     new float4(new float2(initialAnimMainTexST.xy / initialAnimData.FrameCount), 0f),
                     authoring._pivot,
                     authoring.VisualSize,
+                    flipX: authoring._flip.x,
+                    flipY: authoring._flip.y,
                     removeDefaultTransform: authoring._excludeUnityTransformComponents
                 );
                 if(!authoring._disableSorting)
