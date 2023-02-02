@@ -12,10 +12,11 @@ Also before working with this package please read [NSprites documentation](https
 | [Components](https://github.com/Antoshidza/NSprites-Foundation/tree/main/Base/Components) | runtime     | Contains components to be used with NSprites                           |
 | [Render data authoring](About/RenderDataAuthoring.md)                                     | editor      | Bakes basic render data, uses all other parts                          |
 | Render data registration                                                                  | runtime     | Register render data for NSprites render system                        |
-| [Sorting](About/Sorting.md)                                                                     | runtime     | Calculate SortingValue depending on 2D position to use in shader       |
+| [Sorting](About/Sorting.md)                                                               | runtime     | Calculate SortingValue depending on 2D position to use in shader       |
 | Culling                                                                                   | runtime     | Disables / Enables rendering based on 2D position relatively to camera |
-| [Animation](About/Animation.md)                                                                 | runtime     | Shifts UVs values to simulate sprite animation                         |
-| [2D Transform](About/2DTransform.md)                                                            | both        | Provides systems / components to simulate 2D transforms                |
+| [Animation](About/Animation.md)                                                           | runtime     | Shifts UVs values to simulate sprite animation                         |
+| [2D Transform](About/2DTransform.md)                                                      | both        | Provides systems / components to simulate 2D transforms                |
+| Graphics                                                                                  | runtime     | Provides shaders / materials / other render assets                     |
 
 Diagram below illustrates dependencies between parts
 <img src="About/NSprites-Foundation-Map.drawio.svg" width="800"/>
@@ -32,3 +33,9 @@ Diagram below illustrates dependencies between parts
 ### Install via git submodule
 * `cd` to your project's `/Packages` folder
 * git submodule https://github.com/Antoshidza/NSprites-Foundation.git
+### Install via .unitypackage (recommended)
+* Open release you need in this repository
+* Expand Assets foldout and download *.unitypackage file
+* Import it to your project by opening file during unity editor opened or Assets -> Import Package
+> Note: You can select what files to import, use this to filter unwanted assets. Package will be installed
+as local to /Packages folder as usual, but in this case package will be already cached so you can freely modify it.
