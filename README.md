@@ -21,6 +21,13 @@ Also before working with this package please read [NSprites documentation](https
 Diagram below illustrates dependencies between parts
 <img src="About/NSprites-Foundation-Map.drawio.svg" width="800"/>
 
+## Limitations
+* You can use included shaders only with URP, so before anything rendered you should [import, create and assign URP asset in project settings](https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@14.0/manual/InstallingAndConfiguringURP.html).
+If you want use another render pipeline then you need to implement your own [shader and create material](https://github.com/Antoshidza/NSprites/wiki/Prepare-compatible-material) with it.
+* Some components registered as properties in this package, so by default you will have component properties (you can see them [this window](https://github.com/Antoshidza/NSprites/wiki/Debug-NSprites-data)).
+This means that some shader properties names already registered with some component and you can't use similar names for different formats in another shaders you want to use with NSprites.
+If you don't want to have default registered components you can exclude manifest file from asset (use *.unitypackage installation for that).
+
 ## Installation
 ### Requirements
 * [NSprites v2.1.0](https://github.com/Antoshidza/NSprites)
