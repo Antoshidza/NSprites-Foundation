@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -122,6 +123,9 @@ namespace NSprites
         }
         protected Material CreateOverridedMaterial(Texture texture)
         {
+            if (_spriteRenderData.Material == null)
+                throw new ArgumentException($"{nameof(_spriteRenderData.Material)} is null");
+
             var material = new Material(_spriteRenderData.Material);
             material.SetTexture("_MainTex", _sprite.texture);
             _overridedMaterials.Add(texture, material);

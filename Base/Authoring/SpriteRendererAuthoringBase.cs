@@ -1,3 +1,4 @@
+using System;
 using Unity.Entities;
 using UnityEngine;
 
@@ -5,7 +6,7 @@ namespace NSprites
 {
     /// <summary>
     /// Gets <see cref="SpriteRenderData"/> through virtual <see cref="RenderData"/> property then adds <see cref="SpriteRenderDataToRegister"/>.
-    /// Lately <see cref="SpriteRenderBakingSystem"/> will catch those entities and add needed components for rendering. 
+    /// Lately baking system will catch those entities and add needed components for rendering. 
     /// </summary>
     public abstract class SpriteRendererAuthoringBase : MonoBehaviour
     {
@@ -15,9 +16,17 @@ namespace NSprites
             public override void Bake(SpriteRendererAuthoringBase authoring)
             {
                 var renderData = authoring.RenderData;
-                
-                if(renderData.Material == null || renderData.PropertiesSet == null)
+
+                if (renderData.Material == null)
+                {
+                    Debug.LogException(new ArgumentException($"{nameof(SpriteRenderData.Material)} is null"));
                     return;
+                }
+                if (renderData.PropertiesSet == null)
+                {
+                    Debug.LogException(new ArgumentException($"{nameof(SpriteRenderData.PropertiesSet)} is null"));
+                    return;
+                }
 
                 DependsOn(renderData.PropertiesSet);
                 AddComponentObject(new SpriteRenderDataToRegister { data = renderData });
