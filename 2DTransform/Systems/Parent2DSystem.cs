@@ -18,8 +18,8 @@ namespace NSprites
         private EntityQuery _staticRelationshipsAlone;
         private EntityQuery _childBufferAlone;
 
-        private ComponentType _lastParent2DComp = typeof(LastParent2D);
-        private ComponentTypeSet _componentsToRemoveFromUnparentedChildren = new ComponentTypeSet
+        private readonly ComponentType _lastParent2DComp = typeof(LastParent2D);
+        private readonly ComponentTypeSet _componentsToRemoveFromUnparentedChildren = new
         (
             ComponentType.ReadOnly<Parent2D>(),
             ComponentType.ReadOnly<LastParent2D>(),
@@ -29,8 +29,8 @@ namespace NSprites
         [BurstCompile]
         private struct GatherReparentedChildrenDataJob : IJobChunk
         {
-            public NativeMultiHashMap<Entity, Entity>.ParallelWriter parentChildToAdd;
-            public NativeMultiHashMap<Entity, Entity>.ParallelWriter parentChildToRemove;
+            public NativeParallelMultiHashMap<Entity, Entity>.ParallelWriter parentChildToAdd;
+            public NativeParallelMultiHashMap<Entity, Entity>.ParallelWriter parentChildToRemove;
             public NativeParallelHashSet<Entity>.ParallelWriter uniqueAffectedParents;
             [ReadOnly] public ComponentTypeHandle<Parent2D> parent_CTH;
             public ComponentTypeHandle<LastParent2D> lastParent_CTH;
@@ -70,7 +70,7 @@ namespace NSprites
         {
             [ReadOnly] public ComponentTypeHandle<LastParent2D> lastParent_CTH;
             [ReadOnly] public EntityTypeHandle entityTypeHandle;
-            public NativeMultiHashMap<Entity, Entity>.ParallelWriter parentChildToRemove;
+            public NativeParallelMultiHashMap<Entity, Entity>.ParallelWriter parentChildToRemove;
             public NativeParallelHashSet<Entity>.ParallelWriter uniqueAffectedParents;
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
@@ -94,8 +94,8 @@ namespace NSprites
         private struct FixupRelationsJob : IJobParallelForBatch
         {
             [ReadOnly] public NativeArray<Entity> uniqueAffectedParents;
-            [ReadOnly] public NativeMultiHashMap<Entity, Entity> parentChildToAdd;
-            [ReadOnly] public NativeMultiHashMap<Entity, Entity> parentChildToRemove;
+            [ReadOnly] public NativeParallelMultiHashMap<Entity, Entity> parentChildToAdd;
+            [ReadOnly] public NativeParallelMultiHashMap<Entity, Entity> parentChildToRemove;
             public EntityCommandBuffer.ParallelWriter ecb;
             [NativeDisableParallelForRestriction] public BufferLookup<Child2D> child_BL;
 
@@ -296,8 +296,8 @@ namespace NSprites
                 }
                 //remove count is always bigger or equal to add count, so we can use it like max potential size. * 2 because there can be N parent + N last parent and all unique
                 var uniqueParents = new NativeParallelHashSet<Entity>(potentialRemoveCount * 2, Allocator.TempJob);
-                var parentChildToRemove = new NativeMultiHashMap<Entity, Entity>(potentialRemoveCount, Allocator.TempJob);
-                var parentChildToAdd = new NativeMultiHashMap<Entity, Entity>(potentialAddCount, Allocator.TempJob);
+                var parentChildToRemove = new NativeParallelMultiHashMap<Entity, Entity>(potentialRemoveCount, Allocator.TempJob);
+                var parentChildToAdd = new NativeParallelMultiHashMap<Entity, Entity>(potentialAddCount, Allocator.TempJob);
 
                 var uniqueParents_PW = uniqueParents.AsParallelWriter();
                 var parentChildToRemove_PW = parentChildToRemove.AsParallelWriter();
