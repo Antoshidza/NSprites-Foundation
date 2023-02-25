@@ -88,10 +88,7 @@ namespace NSprites
         {
             _ = state.EntityManager.AddComponentData(state.SystemHandle, new SystemData());
         }
-
-        public void OnDestroy(ref SystemState state)
-        {
-        }
+        
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {

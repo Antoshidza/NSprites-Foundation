@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace NSprites
 {
+    [UpdateBefore(typeof(SpriteFrustumCullingSystem))]
     public partial struct UpdateCullingDataSystem : ISystem
     {
         private class SystemData : IComponentData
@@ -24,10 +25,6 @@ namespace NSprites
         public void OnCreate(ref SystemState state)
         {
             state.EntityManager.AddComponentObject(state.SystemHandle, new SystemData());
-        }
-
-        public void OnDestroy(ref SystemState state)
-        {
         }
 
         public void OnUpdate(ref SystemState state)

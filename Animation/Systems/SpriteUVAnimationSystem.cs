@@ -9,9 +9,7 @@ namespace NSprites
 {
     /// Compare <see cref="AnimationTimer"/> with global time and switch <see cref="FrameIndex"/> when timer expired.
     /// Perform only not-culled entities. Restore <see cref="FrameIndex"/> and duration time for entities which be culled for some time.
-    /// 
-    /// Somehow calculations goes a bit wrong and unculled entities gets synchronyzed, don't know how to fix
-    [BurstCompile]
+    /// Somehow calculations goes a bit wrong and unculled entities gets synchronized, don't know how to fix
     public partial struct SpriteUVAnimationSystem : ISystem
     {
         [BurstCompile]
@@ -55,14 +53,7 @@ namespace NSprites
                 }
             }
         }
-
-        public void OnCreate(ref SystemState state)
-        {
-        }
-
-        public void OnDestroy(ref SystemState state)
-        {
-        }
+        
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {

@@ -5,7 +5,7 @@
   "description": "Contains solutions based on NSprites package such as authoring sprite data, animation, sorting, culling systems.",
   "unity": "2022.2",
   "dependencies": {
-    "com.unity.entities": "1.0.0-pre.15"
+    "com.unity.entities": "1.0.0-pre.44"
   },
   "author": {
     "name": "TonyMax",

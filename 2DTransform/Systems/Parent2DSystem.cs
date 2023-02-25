@@ -8,23 +8,20 @@ namespace NSprites
 {
     [UpdateBefore(typeof(LocalToParent2DSystem))]
     [UpdateInGroup(typeof(Unity.Transforms.TransformSystemGroup))]
-    public partial class Parent2DSystem : SystemBase
+    public partial struct Parent2DSystem : ISystem
     {
-        private EntityQuery _missingChildren;
-        private EntityQuery _lastParentLessChildren;
-        private EntityQuery _reparentedChildren;
-        private EntityQuery _missingParents;
-        private EntityQuery _lastParentWithoutParent;
-        private EntityQuery _staticRelationshipsAlone;
-        private EntityQuery _childBufferAlone;
+        public struct SystemData : IComponentData
+        {
+            public EntityQuery MissingChildren;
+            public EntityQuery LastParentLessChildren;
+            public EntityQuery ReparentedChildren;
+            public EntityQuery MissingParents;
+            public EntityQuery LastParentWithoutParent;
+            public EntityQuery StaticRelationshipsAlone;
+            public EntityQuery ChildBufferAlone;
 
-        private readonly ComponentType _lastParent2DComp = typeof(LastParent2D);
-        private readonly ComponentTypeSet _componentsToRemoveFromUnparentedChildren = new
-        (
-            ComponentType.ReadOnly<Parent2D>(),
-            ComponentType.ReadOnly<LastParent2D>(),
-            ComponentType.ReadOnly<LocalPosition2D>()
-        );
+            internal ComponentTypeSet ComponentsToRemoveFromUnparentedChildren;
+        }
 
         [BurstCompile]
         private struct GatherReparentedChildrenDataJob : IJobChunk
@@ -206,91 +203,115 @@ namespace NSprites
             }
         }
 
-        protected override void OnCreate()
+        [BurstCompile]
+        public void OnCreate(ref SystemState state)
         {
-            base.OnCreate();
-            _missingChildren = GetEntityQuery
-            (
-                ComponentType.ReadOnly<LastParent2D>(),
-                ComponentType.Exclude<Parent2D>(),
-                ComponentType.Exclude<StaticRelationshipsTag>()
-            );
-            _lastParentLessChildren = GetEntityQuery
-            (
-                ComponentType.ReadOnly<Parent2D>(),
-                ComponentType.Exclude<LastParent2D>(),
+            var systemData = new SystemData();
+            
+            var queryBuilder = new EntityQueryBuilder(Allocator.Temp);
+            queryBuilder
+                .WithAll<LastParent2D>()
+                .WithNone<Parent2D>()
+                .WithNone<StaticRelationshipsTag>();
+
+            systemData.MissingChildren = state.GetEntityQuery(queryBuilder);
+            queryBuilder.Reset();
+
+            queryBuilder
+                .WithAll<Parent2D>()
+                .WithNone<LastParent2D>()
                 //no need to attach LastParent2D to entities which won't be handled by that system
-                ComponentType.Exclude<StaticRelationshipsTag>()
-            );
-            _reparentedChildren = GetEntityQuery
+                .WithNone<StaticRelationshipsTag>();
+            systemData.LastParentLessChildren = state.GetEntityQuery(queryBuilder);
+            queryBuilder.Reset();
+
+            queryBuilder
+                .WithAll<Parent2D>()
+                .WithAll<LastParent2D>()
+                .WithNone<StaticRelationshipsTag>()
+                //we want to be sure we deal with transform entities, because LocalToParent2DSystem will access this components
+                .WithAll<LocalPosition2D>()
+                .WithAll<WorldPosition2D>();
+            var reparentChildrenQuery = state.GetEntityQuery(queryBuilder);
+            reparentChildrenQuery.SetChangedVersionFilter(ComponentType.ReadOnly<Parent2D>());
+            systemData.ReparentedChildren = reparentChildrenQuery;
+            queryBuilder.Reset();
+
+            queryBuilder
+                .WithAll<Child2D>()
+                .WithNone<WorldPosition2D>()
+                .WithNone<StaticRelationshipsTag>();
+            systemData.MissingParents = state.GetEntityQuery(queryBuilder);
+            queryBuilder.Reset();
+
+            queryBuilder
+                .WithAll<LastParent2D>()
+                .WithNone<Parent2D>();
+            systemData.LastParentWithoutParent = state.GetEntityQuery(queryBuilder);
+            queryBuilder.Reset();
+
+            queryBuilder
+                .WithAll<StaticRelationshipsTag>()
+                .WithNone<Child2D>()
+                .WithNone<Parent2D>();
+            systemData.StaticRelationshipsAlone = state.GetEntityQuery(queryBuilder);
+            queryBuilder.Reset();
+
+            queryBuilder
+                .WithAll<Child2D>()
+                .WithNone<WorldPosition2D>();
+            systemData.ChildBufferAlone = state.GetEntityQuery(queryBuilder);
+
+            queryBuilder.Dispose();
+            
+            systemData.ComponentsToRemoveFromUnparentedChildren = new
             (
                 ComponentType.ReadOnly<Parent2D>(),
-                ComponentType.ReadWrite<LastParent2D>(),
-                ComponentType.Exclude<StaticRelationshipsTag>(),
-
-                //we want to be sure we deal with transform entities, because LocalToParent2DSystem will access this components
-                ComponentType.ReadOnly<LocalPosition2D>(),
-                ComponentType.ReadOnly<WorldPosition2D>()
-            );
-            _reparentedChildren.SetChangedVersionFilter(typeof(Parent2D));
-            _missingParents = GetEntityQuery
-            (
-                ComponentType.ReadOnly<Child2D>(),
-                ComponentType.Exclude<WorldPosition2D>(),
-                ComponentType.Exclude<StaticRelationshipsTag>()
-            );
-            _lastParentWithoutParent = GetEntityQuery
-            (
                 ComponentType.ReadOnly<LastParent2D>(),
-                ComponentType.Exclude<Parent2D>()
+                ComponentType.ReadOnly<LocalPosition2D>()
             );
-            _staticRelationshipsAlone = GetEntityQuery
-            (
-                ComponentType.ReadOnly<StaticRelationshipsTag>(),
-                ComponentType.Exclude<Child2D>(),
-                ComponentType.Exclude<Parent2D>()
-            );
-            _childBufferAlone = GetEntityQuery
-            (
-                ComponentType.ReadOnly<Child2D>(),
-                ComponentType.Exclude<WorldPosition2D>()
-            );
-        }
-        protected override void OnUpdate()
-        {
-            //children without LastParent2D must have one
-            if (!_lastParentLessChildren.IsEmptyIgnoreFilter)
-                EntityManager.AddComponent(_lastParentLessChildren, _lastParent2DComp);
 
-            if (!_missingParents.IsEmptyIgnoreFilter)
+            state.EntityManager.AddComponentData(state.SystemHandle, systemData);
+        }
+        
+        [BurstCompile]
+        public void OnUpdate(ref SystemState state)
+        {
+            var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
+            
+            //children without LastParent2D must have one
+            if (!systemData.LastParentLessChildren.IsEmptyIgnoreFilter)
+                state.EntityManager.AddComponent(systemData.LastParentLessChildren, ComponentType.ReadOnly<Parent2D>());
+
+            if (!systemData.MissingParents.IsEmptyIgnoreFilter)
             {
                 var unparentECB = new EntityCommandBuffer(Allocator.TempJob);
-                Dependency = new UnparentChildrenJob
+                state.Dependency = new UnparentChildrenJob
                 {
-                    entityTypeHandle = GetEntityTypeHandle(),
-                    child_BTH = GetBufferTypeHandle<Child2D>(true),
-                    parent_CL = GetComponentLookup<Parent2D>(true),
+                    entityTypeHandle = SystemAPI.GetEntityTypeHandle(),
+                    child_BTH = SystemAPI.GetBufferTypeHandle<Child2D>(true),
+                    parent_CL = SystemAPI.GetComponentLookup<Parent2D>(true),
                     ecb = unparentECB.AsParallelWriter(),
-                    componentsToRemoveFromChildren = _componentsToRemoveFromUnparentedChildren
-                }.ScheduleParallel(_missingParents, Dependency);
-                Dependency.Complete();
-                unparentECB.Playback(EntityManager);
-                EntityManager.RemoveComponent<Child2D>(_missingParents);
+                    componentsToRemoveFromChildren = systemData.ComponentsToRemoveFromUnparentedChildren
+                }.ScheduleParallel(systemData.MissingParents, state.Dependency);
+                state.Dependency.Complete();
+                unparentECB.Playback(state.EntityManager);
+                state.EntityManager.RemoveComponent<Child2D>(systemData.MissingParents);
                 unparentECB.Dispose();
             }
 
-            var missingChildrenIsEmpty = _missingChildren.IsEmptyIgnoreFilter;
-            var reparentedChildrenIsEmpty = _reparentedChildren.IsEmpty;
+            var missingChildrenIsEmpty = systemData.MissingChildren.IsEmptyIgnoreFilter;
+            var reparentedChildrenIsEmpty = systemData.ReparentedChildren.IsEmpty;
 
             if (!missingChildrenIsEmpty || !reparentedChildrenIsEmpty)
             {
                 var potentialRemoveCount = 0;
                 var potentialAddCount = 0;
                 if (!missingChildrenIsEmpty)
-                    potentialRemoveCount += _missingChildren.CalculateEntityCount();
+                    potentialRemoveCount += systemData.MissingChildren.CalculateEntityCount();
                 if (!reparentedChildrenIsEmpty)
                 {
-                    var reparentedCount = _reparentedChildren.CalculateEntityCount();
+                    var reparentedCount = systemData.ReparentedChildren.CalculateEntityCount();
                     potentialAddCount += reparentedCount;
                     potentialRemoveCount += reparentedCount;
                 }
@@ -302,41 +323,41 @@ namespace NSprites
                 var uniqueParents_PW = uniqueParents.AsParallelWriter();
                 var parentChildToRemove_PW = parentChildToRemove.AsParallelWriter();
 
-                Dependency = new GatherMissingChildrenDataJob
+                state.Dependency = new GatherMissingChildrenDataJob
                 {
-                    entityTypeHandle = GetEntityTypeHandle(),
-                    lastParent_CTH = GetComponentTypeHandle<LastParent2D>(true),
+                    entityTypeHandle = SystemAPI.GetEntityTypeHandle(),
+                    lastParent_CTH = SystemAPI.GetComponentTypeHandle<LastParent2D>(true),
                     uniqueAffectedParents = uniqueParents_PW,
                     parentChildToRemove = parentChildToRemove_PW
-                }.ScheduleParallel(_missingChildren, Dependency);
+                }.ScheduleParallel(systemData.MissingChildren, state.Dependency);
 
-                Dependency = new GatherReparentedChildrenDataJob
+                state.Dependency = new GatherReparentedChildrenDataJob
                 {
                     parentChildToAdd = parentChildToAdd.AsParallelWriter(),
                     parentChildToRemove = parentChildToRemove_PW,
                     uniqueAffectedParents = uniqueParents_PW,
-                    entityTypeHandle = GetEntityTypeHandle(),
-                    parent_CTH = GetComponentTypeHandle<Parent2D>(true),
-                    lastParent_CTH = GetComponentTypeHandle<LastParent2D>(false)
-                }.ScheduleParallel(_reparentedChildren, Dependency);
+                    entityTypeHandle = SystemAPI.GetEntityTypeHandle(),
+                    parent_CTH = SystemAPI.GetComponentTypeHandle<Parent2D>(true),
+                    lastParent_CTH = SystemAPI.GetComponentTypeHandle<LastParent2D>(false)
+                }.ScheduleParallel(systemData.ReparentedChildren, state.Dependency);
 
-                Dependency.Complete();
+                state.Dependency.Complete();
 
                 var ecb = new EntityCommandBuffer(Allocator.TempJob);
                 var uniqueParentArray = uniqueParents.ToNativeArray(Allocator.TempJob);
-                Dependency = new FixupRelationsJob
+                state.Dependency = new FixupRelationsJob
                 {
                     parentChildToAdd = parentChildToAdd,
                     parentChildToRemove = parentChildToRemove,
                     uniqueAffectedParents = uniqueParentArray,
-                    child_BL = GetBufferLookup<Child2D>(false),
+                    child_BL = SystemAPI.GetBufferLookup<Child2D>(false),
                     ecb = ecb.AsParallelWriter(),
                 }.ScheduleBatch(uniqueParentArray.Length, 32, default);
 
                 uniqueParents.Dispose();
 
-                Dependency.Complete();
-                ecb.Playback(EntityManager);
+                state.Dependency.Complete();
+                ecb.Playback(state.EntityManager);
 
                 ecb.Dispose();
                 uniqueParentArray.Dispose();
@@ -344,14 +365,14 @@ namespace NSprites
                 parentChildToRemove.Dispose();
             }
 
-            if (!_lastParentWithoutParent.IsEmptyIgnoreFilter)
-                EntityManager.RemoveComponent<LastParent2D>(_lastParentWithoutParent);
+            if (!systemData.LastParentWithoutParent.IsEmptyIgnoreFilter)
+                state.EntityManager.RemoveComponent<LastParent2D>(systemData.LastParentWithoutParent);
 
-            if (!_staticRelationshipsAlone.IsEmptyIgnoreFilter)
-                EntityManager.RemoveComponent<StaticRelationshipsTag>(_staticRelationshipsAlone);
+            if (!systemData.StaticRelationshipsAlone.IsEmptyIgnoreFilter)
+                state.EntityManager.RemoveComponent<StaticRelationshipsTag>(systemData.StaticRelationshipsAlone);
 
-            if (!_childBufferAlone.IsEmptyIgnoreFilter)
-                EntityManager.RemoveComponent<Child2D>(_childBufferAlone);
+            if (!systemData.ChildBufferAlone.IsEmptyIgnoreFilter)
+                state.EntityManager.RemoveComponent<Child2D>(systemData.ChildBufferAlone);
         }
     }
 }
