@@ -19,12 +19,12 @@ namespace NSprites
 
                 if (renderData.Material == null)
                 {
-                    Debug.LogException(new ArgumentException($"{nameof(SpriteRenderData.Material)} is null"));
+                    Debug.LogException(new ArgumentException($"{nameof(SpriteRenderData.Material)} is null"), authoring.gameObject);
                     return;
                 }
                 if (renderData.PropertiesSet == null)
                 {
-                    Debug.LogException(new ArgumentException($"{nameof(SpriteRenderData.PropertiesSet)} is null"));
+                    Debug.LogException(new ArgumentException($"{nameof(SpriteRenderData.PropertiesSet)} is null"), authoring.gameObject);
                     return;
                 }
 

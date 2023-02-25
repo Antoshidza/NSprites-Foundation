@@ -66,12 +66,12 @@ namespace NSprites
         {
             if (baker == null)
             {
-                Debug.LogError($"Passed baker is null");
+                Debug.LogError($"Passed baker is null", authoring.gameObject);
                 return;
             }
             if (authoring == null)
             {
-                Debug.LogError($"Passed authoring object is null");
+                Debug.LogError($"Passed authoring object is null", authoring.gameObject);
                 return;
             }
 
@@ -124,7 +124,7 @@ namespace NSprites
         protected Material CreateOverridedMaterial(Texture texture)
         {
             if (_spriteRenderData.Material == null)
-                throw new ArgumentException($"{nameof(_spriteRenderData.Material)} is null");
+                Debug.LogException(new ArgumentException($"{nameof(_spriteRenderData.Material)} is null"), gameObject);
 
             var material = new Material(_spriteRenderData.Material);
             material.SetTexture("_MainTex", _sprite.texture);
