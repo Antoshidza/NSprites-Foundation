@@ -52,11 +52,11 @@ namespace NSprites
         [FormerlySerializedAs("scale ")][SerializeField] protected float2 _scale = new(1f);
         [FormerlySerializedAs("_pivot ")][SerializeField] protected float2 _pivot = new(.5f);
         [SerializeField] protected bool2 _flip;
-        [Space]
-        [FormerlySerializedAs("DisableSorting")] [Tooltip("Won't add any sorting related components")] protected bool _disableSorting;
-        [FormerlySerializedAs("StaticSorting")] [Tooltip("Use it when entities exists on the same layer and never changes theirs position / sorting index / layer")] protected bool _staticSorting;
-        [FormerlySerializedAs("SortingIndex")] protected int _sortingIndex;
-        [FormerlySerializedAs("SortingLayer")] protected int _sortingLayer;
+        [Header("Sorting")]
+        [FormerlySerializedAs("DisableSorting")] [Tooltip("Won't add any sorting related components")][SerializeField] protected bool _disableSorting;
+        [FormerlySerializedAs("StaticSorting")] [Tooltip("Use it when entities exists on the same layer and never changes theirs position / sorting index / layer")][SerializeField] protected bool _staticSorting;
+        [FormerlySerializedAs("SortingIndex")][SerializeField] protected int _sortingIndex;
+        [FormerlySerializedAs("SortingLayer")][SerializeField] protected int _sortingLayer;
 
         public static float2 GetSpriteSize(Sprite sprite) => new(sprite.bounds.size.x, sprite.bounds.size.y);
         public virtual float2 VisualSize => GetSpriteSize(_sprite) * _scale;

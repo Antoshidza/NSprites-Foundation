@@ -55,22 +55,21 @@ namespace NSprites
 
         #region jobs
         [BurstCompile]
-        internal struct GatherSortingDataJob : IJobChunk
+        private struct GatherSortingDataJob : IJobChunk
         {
             [ReadOnly] public EntityTypeHandle entityTypeHandle;
             [ReadOnly] public ComponentTypeHandle<WorldPosition2D> worldPosition2D_CTH;
-            [ReadOnly] public ComponentLookup<WorldPosition2D> worldPosition2D_CDFE;
             [ReadOnly] public ComponentTypeHandle<SortingIndex> sortingIndex_CTH;
             [WriteOnly][NativeDisableContainerSafetyRestriction] public NativeArray<SortingData> sortingDataArray;
             [WriteOnly][NativeDisableContainerSafetyRestriction] public NativeArray<int> pointers;
-            [ReadOnly] public NativeArray<int> chunkBasedEntityIndeces;
+            [ReadOnly] public NativeArray<int> chunkBasedEntityIndices;
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
                 var entityArray = chunk.GetNativeArray(entityTypeHandle);
                 var worldPosition2DArray = chunk.GetNativeArray(ref worldPosition2D_CTH);
                 var sortingIndexes = chunk.GetNativeArray(ref sortingIndex_CTH);
-                var firstEntityIndex = chunkBasedEntityIndeces[unfilteredChunkIndex];
+                var firstEntityIndex = chunkBasedEntityIndices[unfilteredChunkIndex];
                 for (int entityIndex = 0; entityIndex < entityArray.Length; entityIndex++)
                 {
                     var arrayIndex = firstEntityIndex + entityIndex;
@@ -95,7 +94,7 @@ namespace NSprites
             public void Execute() => array.Sort(comparer);
         }
         [BurstCompile]
-        internal struct GenerateSortingValuesJob : IJobParallelForBatch
+        private struct GenerateSortingValuesJob : IJobParallelForBatch
         {
             [ReadOnly] public NativeArray<int> pointers;
             [WriteOnly][NativeDisableParallelForRestriction] public NativeArray<SortingValue> sortingValues;
@@ -113,20 +112,20 @@ namespace NSprites
             }
         }
         [BurstCompile]
-        internal struct WriteSortingValuesToChunksJob : IJobChunk
+        private struct WriteSortingValuesToChunksJob : IJobChunk
         {
-            [ReadOnly] public NativeArray<int> chunkBasedEntityIndeces;
+            [ReadOnly] public NativeArray<int> chunkBasedEntityIndices;
             [NativeDisableContainerSafetyRestriction] public ComponentTypeHandle<SortingValue> sortingValue_CTH_WO;
             [ReadOnly] public NativeArray<SortingValue> sortingValues;
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
                 var chunkSortingValues = chunk.GetNativeArray(ref sortingValue_CTH_WO);
-                NativeArray<SortingValue>.Copy(sortingValues, chunkBasedEntityIndeces[unfilteredChunkIndex], chunkSortingValues, 0, chunkSortingValues.Length);
+                NativeArray<SortingValue>.Copy(sortingValues, chunkBasedEntityIndices[unfilteredChunkIndex], chunkSortingValues, 0, chunkSortingValues.Length);
             }
         }
         [BurstCompile]
-        internal struct DisposeArray<TElement> : IJob
+        private struct DisposeArray<TElement> : IJob
             where TElement : unmanaged
         {
             [ReadOnly]
@@ -155,19 +154,18 @@ namespace NSprites
             // will use it to write back result values
             var sortingValues = new NativeArray<SortingValue>(spriteEntitiesCount, Allocator.TempJob);
 
-            var chunkBaseEntityIndeces = sortingQuery.CalculateBaseEntityIndexArrayAsync(Allocator.TempJob, default, out var calculateChunkBaseEntityIndeces);
+            var chunkBaseEntityIndices = sortingQuery.CalculateBaseEntityIndexArrayAsync(Allocator.TempJob, default, out var calculateChunkBaseEntityIndices);
 
             var gatherSortingDataJob = new GatherSortingDataJob
             {
                 entityTypeHandle = SystemAPI.GetEntityTypeHandle(),
                 worldPosition2D_CTH = SystemAPI.GetComponentTypeHandle<WorldPosition2D>(true),
-                worldPosition2D_CDFE = SystemAPI.GetComponentLookup<WorldPosition2D>(true),
                 sortingIndex_CTH = SystemAPI.GetComponentTypeHandle<SortingIndex>(true),
                 pointers = dataPointers,
                 sortingDataArray = sortingDataArray,
-                chunkBasedEntityIndeces = chunkBaseEntityIndeces
+                chunkBasedEntityIndices = chunkBaseEntityIndices
             };
-            var gatherSortingDataHandle = gatherSortingDataJob.ScheduleParallelByRef(sortingQuery, JobHandle.CombineDependencies(calculateChunkBaseEntityIndeces, state.Dependency));
+            var gatherSortingDataHandle = gatherSortingDataJob.ScheduleParallelByRef(sortingQuery, JobHandle.CombineDependencies(calculateChunkBaseEntityIndices, state.Dependency));
 
             // after sorting dataPointers get sorted while sortingDataArray stay the same
             var sortHandle = new SortArrayJob<int, SortingDataComparer>
@@ -197,13 +195,13 @@ namespace NSprites
             {
                 sortingValues = sortingValues,
                 sortingValue_CTH_WO = SystemAPI.GetComponentTypeHandle<SortingValue>(false),
-                chunkBasedEntityIndeces = chunkBaseEntityIndeces
+                chunkBasedEntityIndices = chunkBaseEntityIndices
             };
             var writeBackChunkDataHandle = writeBackChunkDataJob.ScheduleParallelByRef(sortingQuery, genSortingValuesJob);
 
-            //_ = chunkBaseEntityIndeces.Dispose(writeBackChunkDataHandle);
+            //_ = chunkBaseEntityIndices.Dispose(writeBackChunkDataHandle);
             //_ = sortingValues.Dispose(writeBackChunkDataHandle);
-            _ = new DisposeArray<int> { array = chunkBaseEntityIndeces }.Schedule(writeBackChunkDataHandle);
+            _ = new DisposeArray<int> { array = chunkBaseEntityIndices }.Schedule(writeBackChunkDataHandle);
             _ = new DisposeArray<SortingValue> { array = sortingValues }.Schedule(writeBackChunkDataHandle);
 
             return writeBackChunkDataHandle;
@@ -224,7 +222,8 @@ namespace NSprites
             systemData.sortingSpritesQuery = state.GetEntityQuery(queryBuilder);
 
             queryBuilder.Reset();
-            _ = queryBuilder.WithNone<CullSpriteTag>()
+            _ = queryBuilder
+                .WithNone<CullSpriteTag>()
                 .WithAll<WorldPosition2D>()
                 .WithAll<SortingValue>()
                 .WithAll<SortingIndex>()
@@ -244,7 +243,6 @@ namespace NSprites
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-
             var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
             var sortingSpritesIsEmpty = systemData.sortingSpritesQuery.IsEmpty;
             systemData.sortingSpritesQuery.AddOrderVersionFilter();
