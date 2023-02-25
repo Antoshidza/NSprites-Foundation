@@ -36,7 +36,7 @@ namespace NSprites
             var leftBottomPoint = camera.ScreenToWorldPoint(new Vector3(0f, 0f, 0f));
             var rightUpPoint = camera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0f));
             var cameraViewBounds = new float4(leftBottomPoint.x, rightUpPoint.x, leftBottomPoint.y, rightUpPoint.y);
-            SystemAPI.SetSingleton(new SpriteFrustumCullingSystem.SystemData{ cullingBoudns = cameraViewBounds });
+            SystemAPI.SetSingleton(new SpriteFrustumCullingSystem.SystemData{ cullingBounds = cameraViewBounds });
         }
     }
 }

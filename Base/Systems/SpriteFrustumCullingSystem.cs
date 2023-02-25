@@ -1,11 +1,14 @@
 ﻿using Unity.Burst;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEditor;
 
 namespace NSprites
 {
     [BurstCompile]
+    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateBefore(typeof(SpriteRenderingSystem))]
     public partial struct SpriteFrustumCullingSystem : ISystem
     {
         [BurstCompile]
@@ -40,7 +43,7 @@ namespace NSprites
         }
         public struct SystemData : IComponentData
         {
-            public float4 cullingBoudns;
+            public float4 cullingBounds;
         }
 
 #if UNITY_EDITOR
@@ -49,10 +52,10 @@ namespace NSprites
         {
             var systemHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<SpriteFrustumCullingSystem>();
 
-            if (systemHandle == null)
+            if (systemHandle == SystemHandle.Null)
                 return;
 
-            var systemState =  World.DefaultGameObjectInjectionWorld.Unmanaged.ResolveSystemStateRef(systemHandle);
+            ref var systemState = ref World.DefaultGameObjectInjectionWorld.Unmanaged.ResolveSystemStateRef(systemHandle);
 
             systemState.Enabled = !systemState.Enabled;
 
@@ -93,21 +96,24 @@ namespace NSprites
         public void OnUpdate(ref SystemState state)
         {
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
-            var cullingBounds = SystemAPI.GetComponent<SystemData>(state.SystemHandle).cullingBoudns;
+            var cullingBounds = SystemAPI.GetComponent<SystemData>(state.SystemHandle).cullingBounds;
 
             var disableCulledJob = new DisableCulledJob
             {
                 cameraViewBounds = cullingBounds,
                 ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
             };
-            state.Dependency =  disableCulledJob.ScheduleParallelByRef(state.Dependency);
+            var disableCulledHandle = disableCulledJob.ScheduleParallelByRef(state.Dependency);
+            
 
             var enableUnculledJob = new EnableUnculledJob
             {
                 cameraViewBounds = cullingBounds,
                 ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
             };
-            state.Dependency = enableUnculledJob.ScheduleParallelByRef(state.Dependency);
+            var enableUnculledHandle = enableUnculledJob.ScheduleParallelByRef(state.Dependency);
+            
+            state.Dependency = JobHandle.CombineDependencies(disableCulledHandle, enableUnculledHandle);
         }
     }
 }
