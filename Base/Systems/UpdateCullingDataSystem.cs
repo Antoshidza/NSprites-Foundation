@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace NSprites
 {
+    [UpdateBefore(typeof(SpriteFrustumCullingSystem))]
     public partial struct UpdateCullingDataSystem : ISystem
     {
         private class SystemData : IComponentData

@@ -7,8 +7,6 @@ using UnityEditor;
 namespace NSprites
 {
     [BurstCompile]
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
-    [UpdateBefore(typeof(SpriteRenderingSystem))]
     public partial struct SpriteFrustumCullingSystem : ISystem
     {
         [BurstCompile]
