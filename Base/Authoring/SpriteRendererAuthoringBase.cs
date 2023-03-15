@@ -1,4 +1,3 @@
-using System;
 using Unity.Entities;
 using UnityEngine;
 
@@ -15,19 +14,10 @@ namespace NSprites
         {
             public override void Bake(SpriteRendererAuthoringBase authoring)
             {
+                if (!authoring.IsValid)
+                    return;
+
                 var renderData = authoring.RenderData;
-
-                if (renderData.Material == null)
-                {
-                    Debug.LogException(new ArgumentException($"{nameof(SpriteRenderData.Material)} is null"), authoring.gameObject);
-                    return;
-                }
-                if (renderData.PropertiesSet == null)
-                {
-                    Debug.LogException(new ArgumentException($"{nameof(SpriteRenderData.PropertiesSet)} is null"), authoring.gameObject);
-                    return;
-                }
-
                 DependsOn(renderData.PropertiesSet);
                 AddComponentObject(new SpriteRenderDataToRegister { data = renderData });
                 this.AddSpriteRenderComponents(renderData.ID);
@@ -35,5 +25,8 @@ namespace NSprites
         }
 
         protected abstract SpriteRenderData RenderData { get; }
+
+        /// <summary>While returns true base baker works, otherwise does nothing</summary>
+        protected virtual bool IsValid => true;
     }
 }

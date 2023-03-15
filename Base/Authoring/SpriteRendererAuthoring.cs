@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -17,7 +16,7 @@ namespace NSprites
         {
             public override void Bake(SpriteRendererAuthoring authoring)
             {
-                if (authoring._sprite == null)
+                if (!authoring.IsValid)
                     return;
 
                 DependsOn(authoring);
@@ -34,7 +33,7 @@ namespace NSprites
                     flipY: authoring._flip.y,
                     removeDefaultTransform: authoring._excludeUnityTransformComponents
                 );
-                if(!authoring._disableSorting)
+                if (!authoring._disableSorting)
                     BakeSpriteSorting
                     (
                         this,
@@ -44,17 +43,17 @@ namespace NSprites
                     );
             }
         }
-        
+
         [FormerlySerializedAs("_sprite")][SerializeField] protected Sprite _sprite;
         [FormerlySerializedAs("_spriteRenderData")][SerializeField] protected SpriteRenderData _spriteRenderData;
         [FormerlySerializedAs("_overrideSpriteTexture")][SerializeField] protected bool _overrideSpriteTexture = true;
-        [FormerlySerializedAs("ExcludeUnityTransformComponents")] [SerializeField] protected bool _excludeUnityTransformComponents = true;
+        [FormerlySerializedAs("ExcludeUnityTransformComponents")][SerializeField] protected bool _excludeUnityTransformComponents = true;
         [FormerlySerializedAs("scale ")][SerializeField] protected float2 _scale = new(1f);
         [FormerlySerializedAs("_pivot ")][SerializeField] protected float2 _pivot = new(.5f);
         [SerializeField] protected bool2 _flip;
         [Header("Sorting")]
-        [FormerlySerializedAs("DisableSorting")] [Tooltip("Won't add any sorting related components")][SerializeField] protected bool _disableSorting;
-        [FormerlySerializedAs("StaticSorting")] [Tooltip("Use it when entities exists on the same layer and never changes theirs position / sorting index / layer")][SerializeField] protected bool _staticSorting;
+        [FormerlySerializedAs("DisableSorting")][Tooltip("Won't add any sorting related components")][SerializeField] protected bool _disableSorting;
+        [FormerlySerializedAs("StaticSorting")][Tooltip("Use it when entities exists on the same layer and never changes theirs position / sorting index / layer")][SerializeField] protected bool _staticSorting;
         [FormerlySerializedAs("SortingIndex")][SerializeField] protected int _sortingIndex;
         [FormerlySerializedAs("SortingLayer")][SerializeField] protected int _sortingLayer;
 
@@ -66,21 +65,21 @@ namespace NSprites
         {
             if (baker == null)
             {
-                Debug.LogError($"Passed baker is null", authoring.gameObject);
+                Debug.LogError(new NSpritesException($"Passed baker is null"), authoring.gameObject);
                 return;
             }
             if (authoring == null)
             {
-                Debug.LogError($"Passed authoring object is null", authoring.gameObject);
+                Debug.LogError(new NSpritesException($"Passed authoring object is null"), authoring.gameObject);
                 return;
             }
 
             baker.AddComponent(new MainTexST { value = mainTexST });
             baker.AddComponent(new Pivot { value = pivot });
             baker.AddComponent(new Scale2D { value = scale });
-            baker.AddComponent(new Flip{ Value = new int2(flipX ? -1 : 0, flipY ? -1 : 0) });
-            
-            if(removeDefaultTransform)
+            baker.AddComponent(new Flip { Value = new(flipX ? -1 : 0, flipY ? -1 : 0) });
+
+            if (removeDefaultTransform)
                 baker.AddComponent<RemoveDefaultTransformComponentsTag>();
             if (add2DTransform)
             {
@@ -94,20 +93,20 @@ namespace NSprites
         {
             if (baker == null)
             {
-                Debug.LogError($"Passed baker is null");
+                Debug.LogError(new NSpritesException($"Passed baker is null"));
                 return;
             }
-            
+
             baker.AddComponent<VisualSortingTag>();
             baker.AddComponent<SortingValue>();
             baker.AddComponent(new SortingIndex { value = sortingIndex });
             baker.AddSharedComponent(new SortingLayer { index = sortingLayer });
-            if(staticSorting)
+            if (staticSorting)
                 baker.AddComponent<SortingStaticTag>();
         }
-        
+
         private static readonly Dictionary<Texture, Material> _overridedMaterials = new();
-        
+
         protected Material GetOrCreateOverridedMaterial(Texture texture)
         {
             if (!_overridedMaterials.TryGetValue(texture, out var material))
@@ -123,9 +122,6 @@ namespace NSprites
         }
         protected Material CreateOverridedMaterial(Texture texture)
         {
-            if (_spriteRenderData.Material == null)
-                Debug.LogException(new ArgumentException($"{nameof(_spriteRenderData.Material)} is null"), gameObject);
-
             var material = new Material(_spriteRenderData.Material);
             material.SetTexture("_MainTex", _sprite.texture);
             _overridedMaterials.Add(texture, material);
@@ -136,9 +132,46 @@ namespace NSprites
         {
             get
             {
+                if (_spriteRenderData.Material == null)
+                {
+                    Debug.LogException(new NSpritesException($"{nameof(_spriteRenderData.Material)} is null"), gameObject);
+                    return default;
+                }
+
                 if (_overrideSpriteTexture && _sprite != null)
-                    _spriteRenderData.Material = GetOrCreateOverridedMaterial(_sprite.texture);
+                    // create new instance with overrided material
+                    return new()
+                    {
+                        Material = GetOrCreateOverridedMaterial(_sprite.texture),
+                        PropertiesSet = _spriteRenderData.PropertiesSet
+                    };
                 return _spriteRenderData;
+            }
+        }
+
+        protected override bool IsValid
+        {
+            get
+            {
+                if (_sprite == null)
+                {
+                    Debug.LogWarning(new NSpritesException($"{nameof(_sprite)} is null"), gameObject);
+                    return false;
+                }
+
+                if (_spriteRenderData.Material == null)
+                {
+                    Debug.LogWarning(new NSpritesException($"{nameof(SpriteRenderData.Material)} is null"), gameObject);
+                    return false;
+                }
+
+                if (_spriteRenderData.PropertiesSet == null)
+                {
+                    Debug.LogWarning(new NSpritesException($"{nameof(SpriteRenderData.PropertiesSet)} is null"), gameObject);
+                    return false;
+                }
+
+                return base.IsValid;
             }
         }
     }

@@ -16,7 +16,7 @@ namespace NSprites
         {
             public override void Bake(SpriteAnimationAuthoring authoring)
             {
-                if(authoring.AnimationSet == null)
+                if(!authoring.IsValid)
                     return;
 
                 BakeSpriteAnimation(this, authoring.AnimationSet, authoring.InitialAnimationIndex);
@@ -59,17 +59,43 @@ namespace NSprites
             }
         }
 
+        protected override bool IsValid
+        {
+            get
+            {
+                if (AnimationSet == null)
+                {
+                    Debug.LogWarning(new NSpritesException($"{nameof(AnimationSet)} is null"));
+                    return false;
+                }
+
+                if (InitialAnimationIndex >= AnimationSet.Animations.Count)
+                {
+                    Debug.LogWarning(new NSpritesException($"{nameof(InitialAnimationIndex)} can't be greater than animations count. {nameof(InitialAnimationIndex)}: {InitialAnimationIndex}, animation count: {AnimationSet.Animations.Count}"));
+                    return false;
+                }
+
+                if (InitialAnimationIndex < 0)
+                {
+                    Debug.LogWarning(new NSpritesException($"{nameof(InitialAnimationIndex)} can't be lower 0. Currently it is {InitialAnimationIndex}"));
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
         public static void BakeSpriteAnimation<TAuthoring>(Baker<TAuthoring> baker, SpriteAnimationSet animationSet, int initialAnimationIndex = 0)
             where TAuthoring : MonoBehaviour
         {
             if(baker == null)
             {
-                Debug.LogError("Passed Baker is null");
+                Debug.LogError(new NSpritesException("Passed Baker is null"));
                 return;
             }
             if (animationSet == null)
             {
-                Debug.LogError("Passed AnimationSet is null");
+                Debug.LogError(new NSpritesException("Passed AnimationSet is null"));
                 return;
             }
 
@@ -80,7 +106,7 @@ namespace NSprites
 
             if (initialAnimationIndex >= animationSet.Animations.Count || initialAnimationIndex < 0)
             {
-                Debug.LogError($"Initial animation index {initialAnimationIndex} can't be less than 0 or great/equal to animation count {animationSet.Animations.Count}");
+                Debug.LogError(new NSpritesException($"Initial animation index {initialAnimationIndex} can't be less than 0 or great/equal to animation count {animationSet.Animations.Count}"));
                 return;
             }
             
