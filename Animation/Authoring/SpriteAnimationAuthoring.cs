@@ -29,6 +29,7 @@ namespace NSprites
                     this,
                     authoring,
                     new float4(new float2(initialAnimMainTexST.xy / initialAnimData.FrameCount), 0f),
+                    new float4(1f, 1f, 0f, 0f),
                     authoring._pivot,
                     authoring.VisualSize,
                     flipX: authoring._flip.x,

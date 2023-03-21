@@ -20,7 +20,7 @@ namespace NSprites
 
             private void Execute(ref AnimationTimer animationTimer,
                                     ref FrameIndex frameIndex,
-                                    ref MainTexST mainTexST,
+                                    ref UVAtlas uvAtlas,
                                     in AnimationSetLink animationSet,
                                     in AnimationIndex animationIndex)
             {
@@ -49,7 +49,7 @@ namespace NSprites
 
                     var frameSize = new float2(animData.MainTexSTOnAtlas.xy / animData.GridSize);
                     var framePosition = new int2(frameIndex.value % animData.GridSize.x, frameIndex.value / animData.GridSize.x);
-                    mainTexST = new MainTexST { value = new float4(frameSize, animData.MainTexSTOnAtlas.zw + frameSize * framePosition) };
+                    uvAtlas = new UVAtlas { value = new float4(frameSize, animData.MainTexSTOnAtlas.zw + frameSize * framePosition) };
                 }
             }
         }

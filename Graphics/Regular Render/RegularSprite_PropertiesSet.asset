@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: RegularSprite_PropertiesSet
   m_EditorClassIdentifier: 
   propertiesRawData:
-  - propertyName: _mainTexSTBuffer
+  - propertyName: _uvAtlasBuffer
+    updateMode: 2
+  - propertyName: _uvTilingAndOffsetBuffer
     updateMode: 0
   - propertyName: _sortingValueBuffer
     updateMode: 0

@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 namespace NSprites
 {
     /// <summary>
-    /// Adds basic render components such as <see cref="MainTexST"/>, <see cref="Scale2D"/>, <see cref="Pivot"/>.
+    /// Adds basic render components such as <see cref="UVAtlas"/>, <see cref="UVTilingAndOffset"/>, <see cref="Scale2D"/>, <see cref="Pivot"/>.
     /// Optionally adds sorting components, removes built-in 3D transforms and adds 2D transforms.
     /// </summary>
     public class SpriteRendererAuthoring : SpriteRendererAuthoringBase
@@ -27,6 +27,7 @@ namespace NSprites
                     this,
                     authoring,
                     NSpritesUtils.GetTextureST(authoring._sprite),
+                    authoring._tilingAndOffset,
                     authoring._pivot,
                     authoring.VisualSize,
                     flipX: authoring._flip.x,
@@ -45,11 +46,15 @@ namespace NSprites
         }
 
         [FormerlySerializedAs("_sprite")][SerializeField] protected Sprite _sprite;
+        private Sprite _lastAssignedSprite;
         [FormerlySerializedAs("_spriteRenderData")][SerializeField] protected SpriteRenderData _spriteRenderData;
         [FormerlySerializedAs("_overrideSpriteTexture")][SerializeField] protected bool _overrideSpriteTexture = true;
         [FormerlySerializedAs("ExcludeUnityTransformComponents")][SerializeField] protected bool _excludeUnityTransformComponents = true;
         [FormerlySerializedAs("scale ")][SerializeField] protected float2 _scale = new(1f);
         [FormerlySerializedAs("_pivot ")][SerializeField] protected float2 _pivot = new(.5f);
+        [SerializeField] protected float2 _size;
+        [Tooltip("Prevents changing Size when Sprite changed")][SerializeField] private bool _lockSize;
+        [SerializeField] protected float4 _tilingAndOffset = new(1f, 1f, 0f, 0f);
         [SerializeField] protected bool2 _flip;
         [Header("Sorting")]
         [FormerlySerializedAs("DisableSorting")][Tooltip("Won't add any sorting related components")][SerializeField] protected bool _disableSorting;
@@ -60,7 +65,18 @@ namespace NSprites
         public static float2 GetSpriteSize(Sprite sprite) => new(sprite.bounds.size.x, sprite.bounds.size.y);
         public virtual float2 VisualSize => GetSpriteSize(_sprite) * _scale;
 
-        public static void BakeSpriteRender<TAuthoring>(Baker<TAuthoring> baker, TAuthoring authoring, in float4 mainTexST, in float2 pivot, in float2 scale, bool flipX = false, bool flipY = false, bool removeDefaultTransform = true, bool add2DTransform = true)
+        private void OnValidate()
+        {
+            if (_sprite != _lastAssignedSprite && _sprite != null)
+            {
+                _lastAssignedSprite = _sprite;
+
+                if(!_lockSize)
+                    _size = GetSpriteSize(_sprite);
+            }
+        }
+
+        public static void BakeSpriteRender<TAuthoring>(Baker<TAuthoring> baker, TAuthoring authoring, in float4 uvAtlas, in float4 uvTilingAndOffset, in float2 pivot, in float2 scale, bool flipX = false, bool flipY = false, bool removeDefaultTransform = true, bool add2DTransform = true)
             where TAuthoring : MonoBehaviour
         {
             if (baker == null)
@@ -74,7 +90,8 @@ namespace NSprites
                 return;
             }
 
-            baker.AddComponent(new MainTexST { value = mainTexST });
+            baker.AddComponent(new UVAtlas { value = uvAtlas });
+            baker.AddComponent(new UVTilingAndOffset { value = uvTilingAndOffset });
             baker.AddComponent(new Pivot { value = pivot });
             baker.AddComponent(new Scale2D { value = scale });
             baker.AddComponent(new Flip { Value = new(flipX ? -1 : 0, flipY ? -1 : 0) });
