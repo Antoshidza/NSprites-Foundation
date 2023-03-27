@@ -19,8 +19,9 @@ namespace NSprites
 
                 var renderData = authoring.RenderData;
                 DependsOn(renderData.PropertiesSet);
-                AddComponentObject(new SpriteRenderDataToRegister { data = renderData });
-                this.AddSpriteRenderComponents(renderData.ID);
+                var entity = GetEntity(TransformUsageFlags.None);
+                AddComponentObject(entity, new SpriteRenderDataToRegister { data = renderData });
+                this.AddSpriteRenderComponents(entity, renderData.ID);
             }
         }
 

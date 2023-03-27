@@ -22,22 +22,25 @@ namespace NSprites
                 DependsOn(authoring);
                 DependsOn(authoring._sprite);
 
+                var entity = GetEntity(TransformUsageFlags.None);
+
                 BakeSpriteRender
                 (
                     this,
+                    entity,
                     authoring,
                     NSpritesUtils.GetTextureST(authoring._sprite),
                     authoring._tilingAndOffset,
                     authoring._pivot,
                     authoring.VisualSize,
                     flipX: authoring._flip.x,
-                    flipY: authoring._flip.y,
-                    removeDefaultTransform: authoring._excludeUnityTransformComponents
+                    flipY: authoring._flip.y
                 );
                 if (!authoring._disableSorting)
                     BakeSpriteSorting
                     (
                         this,
+                        entity,
                         authoring._sortingIndex,
                         authoring._sortingLayer,
                         authoring._staticSorting
@@ -49,7 +52,6 @@ namespace NSprites
         private Sprite _lastAssignedSprite;
         [FormerlySerializedAs("_spriteRenderData")][SerializeField] protected SpriteRenderData _spriteRenderData;
         [FormerlySerializedAs("_overrideSpriteTexture")][SerializeField] protected bool _overrideSpriteTexture = true;
-        [FormerlySerializedAs("ExcludeUnityTransformComponents")][SerializeField] protected bool _excludeUnityTransformComponents = true;
         [FormerlySerializedAs("scale ")][SerializeField] protected float2 _scale = new(1f);
         [FormerlySerializedAs("_pivot ")][SerializeField] protected float2 _pivot = new(.5f);
         [SerializeField] protected float2 _size;
@@ -76,7 +78,7 @@ namespace NSprites
             }
         }
 
-        public static void BakeSpriteRender<TAuthoring>(Baker<TAuthoring> baker, TAuthoring authoring, in float4 uvAtlas, in float4 uvTilingAndOffset, in float2 pivot, in float2 scale, bool flipX = false, bool flipY = false, bool removeDefaultTransform = true, bool add2DTransform = true)
+        public static void BakeSpriteRender<TAuthoring>(Baker<TAuthoring> baker, in Entity entity, TAuthoring authoring, in float4 uvAtlas, in float4 uvTilingAndOffset, in float2 pivot, in float2 scale, bool flipX = false, bool flipY = false, bool add2DTransform = true)
             where TAuthoring : MonoBehaviour
         {
             if (baker == null)
@@ -90,22 +92,20 @@ namespace NSprites
                 return;
             }
 
-            baker.AddComponent(new UVAtlas { value = uvAtlas });
-            baker.AddComponent(new UVTilingAndOffset { value = uvTilingAndOffset });
-            baker.AddComponent(new Pivot { value = pivot });
-            baker.AddComponent(new Scale2D { value = scale });
-            baker.AddComponent(new Flip { Value = new(flipX ? -1 : 0, flipY ? -1 : 0) });
+            baker.AddComponent(entity, new UVAtlas { value = uvAtlas });
+            baker.AddComponent(entity, new UVTilingAndOffset { value = uvTilingAndOffset });
+            baker.AddComponent(entity, new Pivot { value = pivot });
+            baker.AddComponent(entity, new Scale2D { value = scale });
+            baker.AddComponent(entity, new Flip { Value = new(flipX ? -1 : 0, flipY ? -1 : 0) });
 
-            if (removeDefaultTransform)
-                baker.AddComponent<RemoveDefaultTransformComponentsTag>();
             if (add2DTransform)
             {
-                baker.AddComponentObject(new Transform2DRequest { sourceGameObject = authoring.gameObject });
+                baker.AddComponentObject(entity, new Transform2DRequest { sourceGameObject = authoring.gameObject });
                 baker.DependsOn(authoring.transform);
             }
         }
 
-        public static void BakeSpriteSorting<TAuthoring>(Baker<TAuthoring> baker, int sortingIndex, int sortingLayer, bool staticSorting = false)
+        public static void BakeSpriteSorting<TAuthoring>(Baker<TAuthoring> baker, in Entity entity, int sortingIndex, int sortingLayer, bool staticSorting = false)
             where TAuthoring : MonoBehaviour
         {
             if (baker == null)
@@ -114,12 +114,12 @@ namespace NSprites
                 return;
             }
 
-            baker.AddComponent<VisualSortingTag>();
-            baker.AddComponent<SortingValue>();
-            baker.AddComponent(new SortingIndex { value = sortingIndex });
-            baker.AddSharedComponent(new SortingLayer { index = sortingLayer });
+            baker.AddComponent<VisualSortingTag>(entity);
+            baker.AddComponent<SortingValue>(entity);
+            baker.AddComponent(entity, new SortingIndex { value = sortingIndex });
+            baker.AddSharedComponent(entity, new SortingLayer { index = sortingLayer });
             if (staticSorting)
-                baker.AddComponent<SortingStaticTag>();
+                baker.AddComponent<SortingStaticTag>(entity);
         }
 
         private static readonly Dictionary<Texture, Material> _overridedMaterials = new();

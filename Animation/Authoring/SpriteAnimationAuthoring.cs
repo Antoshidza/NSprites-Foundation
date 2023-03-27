@@ -19,7 +19,9 @@ namespace NSprites
                 if(!authoring.IsValid)
                     return;
 
-                BakeSpriteAnimation(this, authoring.AnimationSet, authoring.InitialAnimationIndex);
+                var entity = GetEntity(TransformUsageFlags.None);
+
+                BakeSpriteAnimation(this, entity, authoring.AnimationSet, authoring.InitialAnimationIndex);
 
                 var initialAnimData = authoring.AnimationSet.Animations.ElementAt(authoring.InitialAnimationIndex).data;
                 var initialAnimMainTexST = (float4)NSpritesUtils.GetTextureST(initialAnimData.SpriteSheet);
@@ -27,19 +29,20 @@ namespace NSprites
                 BakeSpriteRender
                 (
                     this,
+                    entity,
                     authoring,
                     new float4(new float2(initialAnimMainTexST.xy / initialAnimData.FrameCount), 0f),
                     new float4(1f, 1f, 0f, 0f),
                     authoring._pivot,
                     authoring.VisualSize,
                     flipX: authoring._flip.x,
-                    flipY: authoring._flip.y,
-                    removeDefaultTransform: authoring._excludeUnityTransformComponents
+                    flipY: authoring._flip.y
                 );
                 if(!authoring._disableSorting)
                     BakeSpriteSorting
                     (
                         this,
+                        entity,
                         authoring._sortingIndex,
                         authoring._sortingLayer,
                         authoring._staticSorting
@@ -86,7 +89,7 @@ namespace NSprites
             }
         }
 
-        public static void BakeSpriteAnimation<TAuthoring>(Baker<TAuthoring> baker, SpriteAnimationSet animationSet, int initialAnimationIndex = 0)
+        public static void BakeSpriteAnimation<TAuthoring>(Baker<TAuthoring> baker, in Entity entity, SpriteAnimationSet animationSet, int initialAnimationIndex = 0)
             where TAuthoring : MonoBehaviour
         {
             if(baker == null)
@@ -149,12 +152,12 @@ namespace NSprites
 
             ref var initialAnim = ref blobAssetReference.Value[initialAnimationIndex];
 
-            baker.AddComponent(new AnimationSetLink { value = blobAssetReference });
-            baker.AddComponent(new AnimationIndex { value = initialAnimationIndex });
-            baker.AddComponent(new AnimationTimer { value = initialAnim.FrameDurations[0] });
-            baker.AddComponent<FrameIndex>();
+            baker.AddComponent(entity, new AnimationSetLink { value = blobAssetReference });
+            baker.AddComponent(entity, new AnimationIndex { value = initialAnimationIndex });
+            baker.AddComponent(entity, new AnimationTimer { value = initialAnim.FrameDurations[0] });
+            baker.AddComponent<FrameIndex>(entity);
             
-            baker.AddComponent(new MainTexSTInitial { value = initialAnim.MainTexSTOnAtlas });
+            baker.AddComponent(entity, new MainTexSTInitial { value = initialAnim.MainTexSTOnAtlas });
         }
     }
 }
