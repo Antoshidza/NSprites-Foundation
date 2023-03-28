@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   propertiesRawData:
   - propertyName: _uvAtlasBuffer
-    updateMode: 2
+    updateMode: 0
   - propertyName: _uvTilingAndOffsetBuffer
     updateMode: 0
   - propertyName: _sortingValueBuffer
