@@ -24,14 +24,14 @@ namespace NSprites
                 BakeSpriteAnimation(this, entity, authoring.AnimationSet, authoring.InitialAnimationIndex);
 
                 var initialAnimData = authoring.AnimationSet.Animations.ElementAt(authoring.InitialAnimationIndex).data;
-                var initialAnimMainTexST = (float4)NSpritesUtils.GetTextureST(initialAnimData.SpriteSheet);
+                var initialAnimUVAtlas = (float4)NSpritesUtils.GetTextureST(initialAnimData.SpriteSheet);
 
                 BakeSpriteRender
                 (
                     this,
                     entity,
                     authoring,
-                    new float4(new float2(initialAnimMainTexST.xy / initialAnimData.FrameCount), initialAnimMainTexST.zw),
+                    new float4(new float2(initialAnimUVAtlas.xy / initialAnimData.FrameCount), initialAnimUVAtlas.zw),
                     authoring._tilingAndOffset,
                     authoring._pivot,
                     authoring.VisualSize,
@@ -132,7 +132,7 @@ namespace NSprites
                 {
                     ID = Animator.StringToHash(anim.name),
                     GridSize = animData.FrameCount,
-                    MainTexSTOnAtlas = NSpritesUtils.GetTextureST(animData.SpriteSheet),
+                    UVAtlas = NSpritesUtils.GetTextureST(animData.SpriteSheet),
                     Scale2D = new float2(animData.SpriteSheet.bounds.size.x, animData.SpriteSheet.bounds.size.y),
                     AnimationDuration = animationDuration
                     // FrameDuration - allocate lately
@@ -157,7 +157,7 @@ namespace NSprites
             baker.AddComponent(entity, new AnimationTimer { value = initialAnim.FrameDurations[0] });
             baker.AddComponent<FrameIndex>(entity);
             
-            baker.AddComponent(entity, new MainTexSTInitial { value = initialAnim.MainTexSTOnAtlas });
+            baker.AddComponent(entity, new MainTexSTInitial { value = initialAnim.UVAtlas });
         }
     }
 }

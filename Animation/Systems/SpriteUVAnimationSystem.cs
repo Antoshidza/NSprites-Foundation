@@ -4,6 +4,8 @@ using Unity.Burst;
 
 namespace NSprites
 {
+    // TODO: check animation system can work with different frame size animations 
+    
     /// Compare <see cref="AnimationTimer"/> with global time and switch <see cref="FrameIndex"/> when timer expired.
     /// Perform only not-culled entities. Restore <see cref="FrameIndex"/> and duration time for entities which be culled for some time.
     /// Somehow calculations goes a bit wrong and unculled entities gets synchronized, don't know how to fix
@@ -44,9 +46,9 @@ namespace NSprites
 
                     animationTimer.value = time + nextFrameDuration;
 
-                    var frameSize = new float2(animData.MainTexSTOnAtlas.xy / animData.GridSize);
+                    var frameSize = new float2(animData.UVAtlas.xy / animData.GridSize);
                     var framePosition = new int2(frameIndex.value % animData.GridSize.x, frameIndex.value / animData.GridSize.x);
-                    uvAtlas = new UVAtlas { value = new float4(frameSize, animData.MainTexSTOnAtlas.zw + frameSize * framePosition) };
+                    uvAtlas = new UVAtlas { value = new float4(frameSize, animData.UVAtlas.zw + frameSize * framePosition) };
                 }
             }
         }
