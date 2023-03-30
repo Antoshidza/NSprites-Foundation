@@ -30,10 +30,10 @@ If you don't want to have default registered components you can exclude manifest
 
 ## Installation
 ### Requirements
-* [NSprites v3.0.0](https://github.com/Antoshidza/NSprites)
+* [NSprites v3.0.0+](https://github.com/Antoshidza/NSprites)
 * Unity v2022.2.3+
 * Universal RP v14.0.6+
-* Entities v1.0.0-pre.44+
+* Entities v1.0.0-pre.65+
 
 ### [Install via Package Manager](https://docs.unity3d.com/2021.3/Documentation/Manual/upm-ui-giturl.html)
 * Window -> Package Manager -> + button -> Add package from git url
