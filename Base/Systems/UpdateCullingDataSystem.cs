@@ -32,8 +32,8 @@ namespace NSprites
             var camera = state.EntityManager.GetComponentObject<SystemData>(state.SystemHandle).Camera;
             var leftBottomPoint = camera.ScreenToWorldPoint(new Vector3(0f, 0f, 0f));
             var rightUpPoint = camera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0f));
-            var cameraViewBounds = new float4(leftBottomPoint.x, rightUpPoint.x, leftBottomPoint.y, rightUpPoint.y);
-            SystemAPI.SetSingleton(new SpriteFrustumCullingSystem.SystemData{ cullingBounds = cameraViewBounds });
+            var cameraViewBounds2D = new Bounds2D(new float2x2(new float2(leftBottomPoint.x, leftBottomPoint.y), new float2(rightUpPoint.x, rightUpPoint.y)));
+            SystemAPI.SetSingleton(new SpriteFrustumCullingSystem.SystemData{ CullingBounds2D = cameraViewBounds2D});
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Unity.Burst;
 using Unity.Entities;
 using Unity.Jobs;
-using Unity.Mathematics;
 using UnityEditor;
 
 namespace NSprites
@@ -14,14 +13,14 @@ namespace NSprites
         [WithNone(typeof(CullSpriteTag))]
         private partial struct DisableCulledJob : IJobEntity
         {
-            public EntityCommandBuffer.ParallelWriter ecb;
-            public float4 cameraViewBounds;
+            public EntityCommandBuffer.ParallelWriter EntityCommandBuffer;
+            public Bounds2D CameraBounds2D;
 
             private void Execute(Entity entity, [ChunkIndexInQuery]int chunkIndex, in WorldPosition2D worldPosition, in Scale2D size, in Pivot pivot)
             {
-                var viewPosition = worldPosition.value - size.value * pivot.value;
-                if (!IsInsideCameraBounds(GetRect(viewPosition, size.value), cameraViewBounds))
-                    ecb.AddComponent<CullSpriteTag>(chunkIndex, entity);
+                var viewCenterPosition = worldPosition.value - size.value * pivot.value + size.value * .5f;
+                if(!CameraBounds2D.Intersects(new Bounds2D(viewCenterPosition, size.value)))
+                    EntityCommandBuffer.AddComponent<CullSpriteTag>(chunkIndex, entity);
             }
         }
         [BurstCompile]
@@ -29,19 +28,19 @@ namespace NSprites
         [WithAll(typeof(CullSpriteTag))]
         private partial struct EnableUnculledJob : IJobEntity
         {
-            public EntityCommandBuffer.ParallelWriter ecb;
-            public float4 cameraViewBounds;
+            public EntityCommandBuffer.ParallelWriter EntityCommandBuffer;
+            public Bounds2D CameraBounds2D;
 
             private void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndex, in WorldPosition2D worldPosition, in Scale2D size, in Pivot pivot)
             {
-                var viewPosition = worldPosition.value - size.value * pivot.value;
-                if (IsInsideCameraBounds(GetRect(viewPosition, size.value), cameraViewBounds))
-                    ecb.RemoveComponent<CullSpriteTag>(chunkIndex, entity);
+                var viewCenterPosition = worldPosition.value - size.value * pivot.value + size.value * .5f;
+                if (CameraBounds2D.Intersects(new Bounds2D(viewCenterPosition, size.value)))
+                    EntityCommandBuffer.RemoveComponent<CullSpriteTag>(chunkIndex, entity);
             }
         }
         public struct SystemData : IComponentData
         {
-            public float4 cullingBounds;
+            public Bounds2D CullingBounds2D;
         }
 
 #if UNITY_EDITOR
@@ -61,26 +60,7 @@ namespace NSprites
                 systemState.EntityManager.RemoveComponent(systemState.GetEntityQuery(typeof(CullSpriteTag)), ComponentType.ReadOnly<CullSpriteTag>());
         }
 #endif
-        private static float4 GetRect(in float2 position, in float2 size)
-        {
-            var leftBottomPoint = position;
-            var rightUpPoint = position + size;
-            return new float4(leftBottomPoint.x, rightUpPoint.x, leftBottomPoint.y, rightUpPoint.y);
-        }
-        private static bool IsInsideCameraBounds(in float2 position, in float4 cameraViewBounds)
-        {
-            return position.x > cameraViewBounds.x &&
-                position.x < cameraViewBounds.y &&
-                position.y > cameraViewBounds.z &&
-                position.y < cameraViewBounds.w;
-        }
-        private static bool IsInsideCameraBounds(in float4 rect, in float4 cameraViewBounds)
-        {
-            return IsInsideCameraBounds(new float2(rect.x, rect.z), cameraViewBounds) ||
-                IsInsideCameraBounds(new float2(rect.x, rect.w), cameraViewBounds) ||
-                IsInsideCameraBounds(new float2(rect.y, rect.z), cameraViewBounds) ||
-                IsInsideCameraBounds(new float2(rect.y, rect.w), cameraViewBounds);
-        }
+
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
@@ -91,20 +71,20 @@ namespace NSprites
         public void OnUpdate(ref SystemState state)
         {
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
-            var cullingBounds = SystemAPI.GetComponent<SystemData>(state.SystemHandle).cullingBounds;
+            var cullingBounds2D = SystemAPI.GetComponent<SystemData>(state.SystemHandle).CullingBounds2D;
 
             var disableCulledJob = new DisableCulledJob
             {
-                cameraViewBounds = cullingBounds,
-                ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
+                EntityCommandBuffer = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
+                CameraBounds2D = cullingBounds2D
             };
             var disableCulledHandle = disableCulledJob.ScheduleParallelByRef(state.Dependency);
             
 
             var enableUnculledJob = new EnableUnculledJob
             {
-                cameraViewBounds = cullingBounds,
-                ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
+                EntityCommandBuffer = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
+                CameraBounds2D = cullingBounds2D
             };
             var enableUnculledHandle = enableUnculledJob.ScheduleParallelByRef(state.Dependency);
             
