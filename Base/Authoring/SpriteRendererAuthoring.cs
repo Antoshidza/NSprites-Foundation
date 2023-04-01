@@ -2,7 +2,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace NSprites
 {
@@ -48,24 +47,25 @@ namespace NSprites
             }
         }
 
-        [FormerlySerializedAs("_sprite")][SerializeField] protected Sprite _sprite;
+        [SerializeField] protected Sprite _sprite;
         private Sprite _lastAssignedSprite;
-        [FormerlySerializedAs("_spriteRenderData")][SerializeField] protected SpriteRenderData _spriteRenderData;
-        [FormerlySerializedAs("_overrideSpriteTexture")][SerializeField] protected bool _overrideSpriteTexture = true;
-        [FormerlySerializedAs("scale ")][SerializeField] protected float2 _scale = new(1f);
-        [FormerlySerializedAs("_pivot ")][SerializeField] protected float2 _pivot = new(.5f);
+        [SerializeField] protected SpriteRenderData _spriteRenderData;
+        [SerializeField] protected bool _overrideSpriteTexture = true;
+        [SerializeField] protected float2 _pivot = new(.5f);
         [SerializeField] protected float2 _size;
         [Tooltip("Prevents changing Size when Sprite changed")][SerializeField] private bool _lockSize;
         [SerializeField] protected float4 _tilingAndOffset = new(1f, 1f, 0f, 0f);
         [SerializeField] protected bool2 _flip;
+        
         [Header("Sorting")]
-        [FormerlySerializedAs("DisableSorting")][Tooltip("Won't add any sorting related components")][SerializeField] protected bool _disableSorting;
-        [FormerlySerializedAs("StaticSorting")][Tooltip("Use it when entities exists on the same layer and never changes theirs position / sorting index / layer")][SerializeField] protected bool _staticSorting;
-        [FormerlySerializedAs("SortingIndex")][SerializeField] protected int _sortingIndex;
-        [FormerlySerializedAs("SortingLayer")][SerializeField] protected int _sortingLayer;
+        [SerializeField] protected bool _disableSorting;
+        [SerializeField] protected bool _staticSorting;
+        [SerializeField] protected int _sortingIndex;
+        [SerializeField] protected int _sortingLayer;
 
         public static float2 GetSpriteSize(Sprite sprite) => new(sprite.bounds.size.x, sprite.bounds.size.y);
-        public virtual float2 VisualSize => GetSpriteSize(_sprite) * _scale;
+        public virtual float2 VisualSize => _size * new float2(transform.lossyScale.x, transform.lossyScale.y);
+        public float2 NativeSpriteSize => GetSpriteSize(_sprite);
 
         private void OnValidate()
         {
@@ -74,7 +74,7 @@ namespace NSprites
                 _lastAssignedSprite = _sprite;
 
                 if(!_lockSize)
-                    _size = GetSpriteSize(_sprite);
+                    _size = NativeSpriteSize;
             }
         }
 
