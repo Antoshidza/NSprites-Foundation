@@ -15,7 +15,7 @@ namespace NSprites
         [WithNone(typeof(CullSpriteTag))]
         private partial struct AnimationJob : IJobEntity
         {
-            public double time;
+            public double Time;
 
             private void Execute(ref AnimationTimer animationTimer,
                                     ref FrameIndex frameIndex,
@@ -23,7 +23,7 @@ namespace NSprites
                                     in AnimationSetLink animationSet,
                                     in AnimationIndex animationIndex)
             {
-                var timerDelta = time - animationTimer.value;
+                var timerDelta = Time - animationTimer.value;
 
                 if (timerDelta >= 0f)
                 {
@@ -44,7 +44,7 @@ namespace NSprites
                         nextFrameDuration -= extraTime;
                     }
 
-                    animationTimer.value = time + nextFrameDuration;
+                    animationTimer.value = Time + nextFrameDuration;
 
                     var frameSize = new float2(animData.UVAtlas.xy / animData.GridSize);
                     var framePosition = new int2(frameIndex.value % animData.GridSize.x, frameIndex.value / animData.GridSize.x);
@@ -56,7 +56,7 @@ namespace NSprites
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var animationJob = new AnimationJob { time = SystemAPI.Time.ElapsedTime };
+            var animationJob = new AnimationJob { Time = SystemAPI.Time.ElapsedTime };
             state.Dependency = animationJob.ScheduleParallelByRef(state.Dependency);
         }
     }
