@@ -1,6 +1,7 @@
 ﻿using Unity.Burst;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEditor;
 
 namespace NSprites
@@ -38,8 +39,9 @@ namespace NSprites
                     EntityCommandBuffer.RemoveComponent<CullSpriteTag>(chunkIndex, entity);
             }
         }
-        public struct SystemData : IComponentData
+        public struct CameraData : IComponentData
         {
+            public float2 Position;
             public Bounds2D CullingBounds2D;
         }
 
@@ -64,14 +66,15 @@ namespace NSprites
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            _ = state.EntityManager.AddComponentData(state.SystemHandle, new SystemData());
+            state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
+            _ = state.EntityManager.AddComponentData(state.SystemHandle, new CameraData());
         }
         
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
-            var cullingBounds2D = SystemAPI.GetComponent<SystemData>(state.SystemHandle).CullingBounds2D;
+            var cullingBounds2D = SystemAPI.GetComponent<CameraData>(state.SystemHandle).CullingBounds2D;
 
             var disableCulledJob = new DisableCulledJob
             {

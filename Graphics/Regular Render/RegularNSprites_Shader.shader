@@ -113,10 +113,9 @@
                 return varyings;
             }
 
-            half4 UnlitFragment(Varyings varyings, uint instanceID : SV_InstanceID) : SV_Target
+            float4 UnlitFragment(Varyings varyings, uint instanceID : SV_InstanceID) : SV_Target
             {
-                // TODO: instead of accessing every time in frag shader do this ones in vertex and then pass value with varyings
-                #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
+#if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
                 int propertyIndex = _propertyPointers[instanceID];
                 float4 uvAtlas = _uvAtlasBuffer[propertyIndex];
 #else
@@ -126,7 +125,7 @@
                 // finally frac UV and locate texture on atlas, now our UV is inside actual texture bounds (repeated)
                 varyings.uv = TilingAndOffset(frac(varyings.uv), uvAtlas.xy, uvAtlas.zw);
 
-                half4 texColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, varyings.uv);
+                float4 texColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, varyings.uv);
                 clip(texColor.w - 0.5);
                 return texColor;
             }

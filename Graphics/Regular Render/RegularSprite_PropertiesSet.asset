@@ -24,6 +24,6 @@ MonoBehaviour:
   - propertyName: _pivotBuffer
     updateMode: 2
   - propertyName: _heightWidthBuffer
-    updateMode: 2
+    updateMode: 0
   - propertyName: _flipBuffer
     updateMode: 0
