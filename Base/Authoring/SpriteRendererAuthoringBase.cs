@@ -1,3 +1,4 @@
+using NSprites.Modules;
 using Unity.Entities;
 using UnityEngine;
 
@@ -17,11 +18,7 @@ namespace NSprites
                 if (!authoring.IsValid)
                     return;
 
-                var renderData = authoring.RenderData;
-                DependsOn(renderData.PropertiesSet);
-                var entity = GetEntity(TransformUsageFlags.None);
-                AddComponentObject(entity, new SpriteRenderDataToRegister { data = renderData });
-                this.AddSpriteRenderComponents(entity, renderData.ID);
+                this.BakeSpriteBase(authoring.RenderData);
             }
         }
 
