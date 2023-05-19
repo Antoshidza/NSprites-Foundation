@@ -84,7 +84,7 @@ namespace NSprites.Modules
         private Material CreateOverridedMaterial(Texture texture)
         {
             var material = new Material(SpriteRenderData.Material);
-            material.SetTexture("_MainTex", Sprite.texture);
+            material.SetTexture(MainTexPropertyID, Sprite.texture);
             OverridedMaterials.Add(texture, material);
             return material;
         }
