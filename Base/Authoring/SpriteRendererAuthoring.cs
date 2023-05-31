@@ -79,7 +79,7 @@ namespace NSprites
             }
         }
 
-        public static void BakeSpriteRender<TAuthoring>(Baker<TAuthoring> baker, in Entity entity, TAuthoring authoring, in float4 uvAtlas, in float4 uvTilingAndOffset, in float2 pivot, in float2 scale, bool flipX = false, bool flipY = false, bool add2DTransform = true)
+        public static void BakeSpriteRender<TAuthoring>(Baker<TAuthoring> baker, in Entity entity, TAuthoring authoring, in float4 uvAtlas, in float4 uvTilingAndOffset, in float2 pivot, in float2 scale, bool flipX = false, bool flipY = false)
             where TAuthoring : MonoBehaviour
         {
             if (baker == null)
