@@ -49,5 +49,22 @@ namespace NSprites
             return min.x <= anotherMax.x && max.x >= anotherMin.x &&
                    min.y <= anotherMax.y && max.y >= anotherMin.y;
         }
+        
+        public static Bounds2D From(in LocalToWorld2D worldPosition, in Scale2D size, in Pivot pivot)
+        {
+            float  rotation = MathHelper.eulerZ(worldPosition.Rotation);
+            float2 scale    = worldPosition.Scale * size.value;
+            float2 position = worldPosition.Position - scale * pivot.value + scale * .5f;
+
+            float sin = -math.sin(rotation);
+            float cos = -math.cos(rotation);
+
+            float2 adjustedScale = new float2(
+                x: scale.x * cos + scale.y * sin,
+                y: scale.x * sin + scale.y * cos
+            );
+
+            return new Bounds2D(position, adjustedScale);
+        }
     }
 }

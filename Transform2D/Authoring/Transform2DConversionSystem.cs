@@ -2,7 +2,7 @@
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
-using static NSprites.math2D;
+using static NSprites.MathHelper;
 
 
 

@@ -6,7 +6,7 @@ using Unity.Properties;
 using float2 = Unity.Mathematics.float2;
 using float4x4 = Unity.Mathematics.float4x4;
 using quaternion = Unity.Mathematics.quaternion;
-using static NSprites.math2D;
+using static NSprites.MathHelper;
 using static Unity.Mathematics.math;
 
 
