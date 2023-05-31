@@ -14,11 +14,12 @@ namespace NSprites
             public float2 CameraPosition;
             public float2 ScreenSize;
             
-            private void Execute(ref Scale2D size, ref WorldPosition2D position, ref UVTilingAndOffset uvTilingAndOffset, in NativeSpriteSize nativeSpriteSize)
+            private void Execute(ref Scale2D scale, ref LocalTransform2D transform, ref UVTilingAndOffset uvTilingAndOffset, in NativeSpriteSize nativeSpriteSize)
             {
-                size.value = ScreenSize;
-                position.value = CameraPosition;
-                uvTilingAndOffset.value = new float4(size.value / nativeSpriteSize.Value, CameraPosition / nativeSpriteSize.Value - size.value / nativeSpriteSize.Value / 2f);
+                scale.value = ScreenSize;
+                transform.Scale = 1;
+                transform.Position = CameraPosition;
+                uvTilingAndOffset.value = new float4(ScreenSize / nativeSpriteSize.Value, CameraPosition / nativeSpriteSize.Value - ScreenSize / nativeSpriteSize.Value / 2f);
             }
         }
         

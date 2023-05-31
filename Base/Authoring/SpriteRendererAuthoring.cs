@@ -9,6 +9,7 @@ namespace NSprites
     /// Adds basic render components such as <see cref="UVAtlas"/>, <see cref="UVTilingAndOffset"/>, <see cref="Scale2D"/>, <see cref="Pivot"/>.
     /// Optionally adds sorting components, removes built-in 3D transforms and adds 2D transforms.
     /// </summary>
+    [RequireComponent(typeof(Transform2DAuthoring))]
     public class SpriteRendererAuthoring : SpriteRendererAuthoringBase
     {
         private class Baker : Baker<SpriteRendererAuthoring>
@@ -97,12 +98,6 @@ namespace NSprites
             baker.AddComponent(entity, new Pivot { value = pivot });
             baker.AddComponent(entity, new Scale2D { value = scale });
             baker.AddComponent(entity, new Flip { Value = new(flipX ? -1 : 0, flipY ? -1 : 0) });
-
-            if (add2DTransform)
-            {
-                baker.AddComponentObject(entity, new Transform2DRequest { sourceGameObject = authoring.gameObject });
-                baker.DependsOn(authoring.transform);
-            }
         }
 
         public static void BakeSpriteSorting<TAuthoring>(Baker<TAuthoring> baker, in Entity entity, int sortingIndex, int sortingLayer, bool staticSorting = false)
