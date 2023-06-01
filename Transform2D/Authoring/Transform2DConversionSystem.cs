@@ -26,7 +26,7 @@ namespace NSprites
                     {
                         var childEntities = new NativeList<Entity>(1, Allocator.Temp);
                         entityDebugManager.GetEntitiesForAuthoringObject(comp, childEntities);
-                        bool findAny = childEntities.Length != 0;
+                        var findAny = childEntities.Length != 0;
                         entity = findAny
                             ? childEntities[0]
                             : Entity.Null;
