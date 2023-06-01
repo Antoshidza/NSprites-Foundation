@@ -60,8 +60,8 @@ namespace NSprites
 
                         for (int i = 0; i < transform.childCount; i++)
                         {
-                            Transform child = transform.GetChild(i);
-                            Entity childEntity = GetPrimaryEntity(child);
+                            var child = transform.GetChild(i);
+                            var childEntity = GetPrimaryEntity(child);
                             if (childEntity == Entity.Null || EntityManager.HasComponent<ExcludeFrom2DConversion>(childEntity)/*child.TryGetComponent<ExcludeFrom2DConversion>(out _)*/)
                                 continue;
 
