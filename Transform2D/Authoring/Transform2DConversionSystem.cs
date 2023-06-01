@@ -14,8 +14,8 @@ namespace NSprites
         protected override void OnUpdate()
         {
             // need to retrieve entity from authoring gameobject
-            EntityManager.EntityManagerDebug entityDebugManager = EntityManager.Debug;
-            EntityCommandBuffer              ecb                = new EntityCommandBuffer(Allocator.Temp);
+            var entityDebugManager = EntityManager.Debug;
+            var ecb = new EntityCommandBuffer(Allocator.Temp);
 
             Entities
                 .WithEntityQueryOptions(EntityQueryOptions.IncludePrefab)
