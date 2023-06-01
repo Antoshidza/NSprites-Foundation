@@ -4,9 +4,6 @@ using Unity.Mathematics;
 using UnityEngine;
 
 // ReSharper disable InconsistentNaming
-
-
-
 namespace NSprites
 {
     [BurstCompile]
