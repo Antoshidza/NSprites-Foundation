@@ -24,7 +24,7 @@ namespace NSprites
                 {
                     bool TryGetPrimaryEntity(Component comp, out Entity entity)
                     {
-                        NativeList<Entity> childEntities = new (1, Allocator.Temp);
+                        var childEntities = new NativeList<Entity>(1, Allocator.Temp);
                         entityDebugManager.GetEntitiesForAuthoringObject(comp, childEntities);
                         bool findAny = childEntities.Length != 0;
                         entity = findAny
