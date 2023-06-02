@@ -11,8 +11,8 @@ namespace NSprites
     {
         public static float2 rotate(float angle, float2 position)
         {
-            float sin = math.sin(angle);
-            float cos = math.cos(angle);
+            var sin = math.sin(angle);
+            var cos = math.cos(angle);
             
             return new float2(
                 position.x * cos - position.y * sin,
@@ -31,7 +31,7 @@ namespace NSprites
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static quaternion quaternion(float angle)
         {
-            float4 value = new (){
+            var value = new float4 {
                 z = math.sin(angle / 2),
                 w = math.cos(angle / 2)
             };
@@ -42,36 +42,37 @@ namespace NSprites
 
         public static float3 euler(quaternion quaternion)
         {
-            float4 q = quaternion.value;
-            float3 angles = new ();
+            var q = quaternion.value;
             
             // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
             
             // roll (x-axis rotation)
-            float sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
-            float cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
-            angles.x = math.atan2(sinr_cosp, cosr_cosp);
+            var sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
+            var cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
         
             // pitch (y-axis rotation)
-            float sinp = math.sqrt(1 + 2 * (q.w * q.y - q.x * q.z));
-            float cosp = math.sqrt(1 - 2 * (q.w * q.y - q.x * q.z));
-            angles.y = 2 * math.atan2(sinp, cosp) - math.PI / 2;
-        
+            var sinp = math.sqrt(1 + 2 * (q.w * q.y - q.x * q.z));
+            var cosp = math.sqrt(1 - 2 * (q.w * q.y - q.x * q.z));
+
             // yaw (z-axis rotation)
-            float siny_cosp = 2 * (q.w * q.z + q.x * q.y);
-            float cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
-            angles.z = math.atan2(siny_cosp, cosy_cosp);
+            var siny_cosp = 2 * (q.w * q.z + q.x * q.y);
+            var cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
                 
-            return angles;
+            return new
+            (
+                        math.atan2(sinr_cosp, cosr_cosp),
+                        2 * math.atan2(sinp, cosp) - math.PI / 2,
+                        math.atan2(siny_cosp, cosy_cosp)
+            );
         }
 
 
         public static float eulerZ(quaternion quaternion)
         {
-            float4 q = quaternion.value;
+            var q = quaternion.value;
             
-            float siny_cosp = 2 * (q.w * q.z + q.x * q.y);
-            float cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
+            var siny_cosp = 2 * (q.w * q.z + q.x * q.y);
+            var cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
             return math.atan2(siny_cosp, cosy_cosp);
         }
 
