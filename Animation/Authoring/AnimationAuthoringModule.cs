@@ -13,7 +13,7 @@ namespace NSprites
 
         public SpriteAnimation InitialAnimationData => AnimationSet.Animations.ElementAt(InitialAnimationIndex).data; 
 
-        public bool IsValid(Texture2D texture)
+        public bool IsValid()
         {
             if (AnimationSet == null)
             {
@@ -33,11 +33,11 @@ namespace NSprites
                 return false;
             }
 
-            return AnimationSet.IsValid(texture);
+            return AnimationSet.IsValid(InitialAnimationData.SpriteSheet.texture);
         }
         
-        public void Bake<TAuthoring>(Baker<TAuthoring> baker, in Entity entity)
+        public void Bake<TAuthoring>(Baker<TAuthoring> baker)
             where TAuthoring : MonoBehaviour
-            => baker.BakeAnimation(entity, AnimationSet, InitialAnimationIndex);
+            => baker.BakeAnimation(baker.GetEntity(TransformUsageFlags.None), AnimationSet, InitialAnimationIndex);
     }
 }
