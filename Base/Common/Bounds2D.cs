@@ -1,4 +1,5 @@
-﻿using Unity.Mathematics;
+﻿using System;
+using Unity.Mathematics;
 
 namespace NSprites
 {
@@ -37,6 +38,21 @@ namespace NSprites
         public static bool operator !=(Bounds2D lhs, Bounds2D rhs)
         {
             return !Equals(lhs, rhs);
+        }
+        
+        public bool Equals(Bounds2D other)
+        {
+            return _position.Equals(other._position) && _extents.Equals(other._extents);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Bounds2D other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(_position, _extents);
         }
 
         public bool Intersects(in Bounds2D bounds)
