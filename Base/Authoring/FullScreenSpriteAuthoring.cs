@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using NSprites.Authoring;
+using Unity.Entities;
 using UnityEngine;
 
 namespace NSprites

@@ -3,7 +3,7 @@ using System.Linq;
 using Unity.Entities;
 using UnityEngine;
 
-namespace NSprites
+namespace NSprites.Authoring
 {
     [Serializable]
     public struct AnimationAuthoringModule

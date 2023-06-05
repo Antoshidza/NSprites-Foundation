@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using Unity.Entities;
 using UnityEngine;
 
-namespace NSprites.Modules
+namespace NSprites.Authoring
 {
     /// <summary>
     /// Register <see cref="SpriteRenderData"/> by creating new <see cref="Material"/> with overrided <see cref="Texture2D"/> from <see cref="Sprite"/>

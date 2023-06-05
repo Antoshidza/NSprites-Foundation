@@ -3,7 +3,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace NSprites
+namespace NSprites.Authoring
 {
     [Serializable]
     public class SpriteSettingsModule
@@ -23,6 +23,7 @@ namespace NSprites
         public float4 TilingAndOffset = new(1f, 1f, 0f, 0f);
         public bool2 Flip;
 
+        // TODO: utilize native size to use as default size multiplied by scale and size
         public void Bake<TAuthoring>(Baker<TAuthoring> baker, TAuthoring authoring, in float2 nativeSize, in float4 uvAtlas)
             where TAuthoring : Component
         {

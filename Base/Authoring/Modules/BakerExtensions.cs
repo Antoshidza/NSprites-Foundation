@@ -2,7 +2,7 @@
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace NSprites
+namespace NSprites.Authoring
 {
     public static partial class BakerExtensions
     {
