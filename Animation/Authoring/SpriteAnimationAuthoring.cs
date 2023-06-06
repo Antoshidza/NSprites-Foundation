@@ -34,7 +34,18 @@ namespace NSprites
         [SerializeField] public SpriteSettingsModule RenderSettings;
         [SerializeField] public SortingAuthoringModule Sorting;
 
-        protected virtual bool IsValid 
-            => AnimationAuthoringModule.IsValid();
+        protected virtual bool IsValid
+        {
+            get
+            {
+                if (!RegisterSpriteData.IsValid(out var message))
+                {
+                    Debug.LogWarning($"{nameof(SpriteAnimationAuthoring)}: {message}" );
+                    return false;
+                }
+
+                return AnimationAuthoringModule.IsValid();
+            }
+        }
     }
 }
