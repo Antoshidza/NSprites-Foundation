@@ -8,11 +8,11 @@ namespace NSprites
     /// <summary>
     /// Advanced <see cref="SpriteRendererAuthoring"/> which also bakes animation data as blob asset and adds animation components.
     /// </summary>
-    public class SpriteAnimationAuthoring : MonoBehaviour
+    public class SpriteAnimatedRendererAuthoring : MonoBehaviour
     {
-        private class Baker : Baker<SpriteAnimationAuthoring>
+        private class Baker : Baker<SpriteAnimatedRendererAuthoring>
         {
-            public override void Bake(SpriteAnimationAuthoring authoring)
+            public override void Bake(SpriteAnimatedRendererAuthoring authoring)
             {
                 if(!authoring.IsValid)
                     return;
@@ -40,7 +40,7 @@ namespace NSprites
             {
                 if (!RegisterSpriteData.IsValid(out var message))
                 {
-                    Debug.LogWarning($"{nameof(SpriteAnimationAuthoring)}: {message}" );
+                    Debug.LogWarning($"{nameof(SpriteAnimatedRendererAuthoring)}: {message}" );
                     return false;
                 }
 
