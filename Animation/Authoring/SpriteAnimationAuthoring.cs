@@ -29,21 +29,10 @@ namespace NSprites
             }
         }
         
-        [SerializeField] protected AnimationAuthoringModule AnimationAuthoringModule;
-        [SerializeField] protected RegisterSpriteAuthoringModule RegisterSpriteData;
-        [SerializeField] protected SpriteSettingsModule RenderSettings;
-        [SerializeField] protected SortingAuthoringModule Sorting;
-
-        private float2 FrameSize
-        {
-            get
-            {
-                var animationData = AnimationAuthoringModule.InitialAnimationData;
-                return animationData.SpriteSheet.GetSize() / animationData.FrameCount;
-            }
-        }
-
-        public float2 ScaledSize => RenderSettings.Size * FrameSize * new float2(transform.lossyScale.x, transform.lossyScale.y);
+        [SerializeField] public AnimationAuthoringModule AnimationAuthoringModule;
+        [SerializeField] public RegisterSpriteAuthoringModule RegisterSpriteData;
+        [SerializeField] public SpriteSettingsModule RenderSettings;
+        [SerializeField] public SortingAuthoringModule Sorting;
 
         protected virtual bool IsValid 
             => AnimationAuthoringModule.IsValid();
