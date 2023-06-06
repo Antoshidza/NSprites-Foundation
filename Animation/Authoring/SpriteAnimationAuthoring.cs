@@ -20,17 +20,17 @@ namespace NSprites
                 var initialAnimData = authoring.AnimationAuthoringModule.InitialAnimationData;
                 var initialSheetUVAtlas = (float4)NSpritesUtils.GetTextureST(initialAnimData.SpriteSheet);
                 var initialFrameUVAtlas = new float4(new float2(initialSheetUVAtlas.xy / initialAnimData.FrameCount), initialSheetUVAtlas.zw);
+                var frameSize = initialAnimData.SpriteSheet.GetSize() / initialAnimData.FrameCount;
                 
                 authoring.RegisterSpriteData.Bake(this, initialAnimData.SpriteSheet.texture);
                 authoring.AnimationAuthoringModule.Bake(this);
-                authoring.RenderSettings.Bake(this, authoring, authoring.NativeSpriteSize, initialFrameUVAtlas);
+                authoring.RenderSettings.Bake(this, authoring, frameSize, initialFrameUVAtlas);
                 authoring.Sorting.Bake(this);
             }
         }
         
         [SerializeField] protected AnimationAuthoringModule AnimationAuthoringModule;
         [SerializeField] protected RegisterSpriteAuthoringModule RegisterSpriteData;
-
         [SerializeField] protected SpriteSettingsModule RenderSettings;
         [SerializeField] protected SortingAuthoringModule Sorting;
 
@@ -43,12 +43,9 @@ namespace NSprites
             }
         }
 
-        protected virtual float2 NativeSpriteSize => FrameSize;
+        public float2 ScaledSize => RenderSettings.Size * FrameSize * new float2(transform.lossyScale.x, transform.lossyScale.y);
 
         protected virtual bool IsValid 
             => AnimationAuthoringModule.IsValid();
-
-        [ContextMenu("Set Native Size")]
-        public void SetNativeSize() => RenderSettings.Size = FrameSize;
     }
 }

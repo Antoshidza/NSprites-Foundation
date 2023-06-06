@@ -1,6 +1,5 @@
 ﻿using NSprites.Authoring;
 using Unity.Entities;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace NSprites
@@ -21,29 +20,19 @@ namespace NSprites
                 DependsOn(authoring);
 
                 authoring.RegisterSpriteData.Bake(this, authoring.OverrideTextureFromSprite ? authoring.Sprite.texture : null);
-                authoring.RenderSettings.Bake(this, authoring, authoring.NativeSpriteSize, NSpritesUtils.GetTextureST(authoring.Sprite));
+                authoring.RenderSettings.Bake(this, authoring, authoring.Sprite.GetSize(), NSpritesUtils.GetTextureST(authoring.Sprite));
                 authoring.Sorting.Bake(this);
             }
         }
 
-        [SerializeField] protected Sprite Sprite;
-        [SerializeField] protected RegisterSpriteAuthoringModule RegisterSpriteData;
-        [SerializeField] protected bool OverrideTextureFromSprite = true;
+        [SerializeField] public Sprite Sprite;
+        [SerializeField] public RegisterSpriteAuthoringModule RegisterSpriteData;
+        [SerializeField] public bool OverrideTextureFromSprite = true;
         
-        [SerializeField] protected SpriteSettingsModule RenderSettings;
-        [SerializeField] protected SortingAuthoringModule Sorting;
+        [SerializeField] public SpriteSettingsModule RenderSettings;
+        [SerializeField] public SortingAuthoringModule Sorting;
 
-        public float2 ScaledSize => RenderSettings.Size * new float2(transform.lossyScale.x, transform.lossyScale.y);
-
-        /// <summary> "Default" sprite size which would be a size of same sprite being placed on scene as a unity's built-in SpriteRenderer. </summary>
-        public virtual float2 NativeSpriteSize => Sprite.GetSize();
-
-        [ContextMenu("Set Native Size")]
-        private void SetNativeSize() => RenderSettings.TrySetSize(NativeSpriteSize);
-        
-        internal void OnSpriteChanged() => SetNativeSize();
-
-        protected virtual bool IsValid
+        private bool IsValid
         {
             get
             {

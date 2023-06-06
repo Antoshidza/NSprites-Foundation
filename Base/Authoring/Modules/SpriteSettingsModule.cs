@@ -23,7 +23,19 @@ namespace NSprites.Authoring
         public float4 TilingAndOffset = new(1f, 1f, 0f, 0f);
         public bool2 Flip;
 
-        // TODO: utilize native size to use as default size multiplied by scale and size
+        /// <summary>
+        /// Bakes sprite default (for NSprites-Foundation package) such as
+        /// <list type="bullet">
+        /// <item><see cref="UVAtlas"/> and <see cref="UVTilingAndOffset"/></item>
+        /// <item><see cref="Scale2D"/></item>
+        /// <item><see cref="Pivot"/></item>
+        /// <item><see cref="Flip"/></item>
+        /// </list>
+        /// </summary>
+        /// <param name="baker">baker bruh</param>
+        /// <param name="authoring">authoring monobehaviour</param>
+        /// <param name="nativeSize">The native size of a sprite being baked. Needs because sprite and it's params can come from arbitrary source, so need to be passed</param>
+        /// <param name="uvAtlas">The same as <see cref="nativeSize"/> should be passed, because of external sprite</param>
         public void Bake<TAuthoring>(Baker<TAuthoring> baker, TAuthoring authoring, in float2 nativeSize, in float4 uvAtlas)
             where TAuthoring : Component
         {
@@ -35,9 +47,9 @@ namespace NSprites.Authoring
                 baker.GetEntity(TransformUsageFlags.None),
                 authoring,
                 uvAtlas,
-                GetTilingAndOffsetByDrawMode(nativeSize),
+                GetTilingAndOffsetByDrawMode(),
                 Pivot,
-                Size * new float2(authoringScale.x, authoringScale.y),
+                Size * nativeSize * new float2(authoringScale.x, authoringScale.y),
                 flipX: Flip.x,
                 flipY: Flip.y
             );
@@ -53,17 +65,16 @@ namespace NSprites.Authoring
 
         /// <summary>
         /// Returns UV Tiling & Offset accounting selected <see cref="DrawMode"/>.
-        /// If <see cref="DrawModeType.Tiled"/> selected then it requires additional calculations and Native Size of sprite passed in.
         /// </summary>
-        public float4 GetTilingAndOffsetByDrawMode(float2 nativeSpriteSize)
+        public float4 GetTilingAndOffsetByDrawMode()
         {
             return DrawMode switch
             {
                 // just return default user defined Tiling&Offset from inspector
                 DrawModeType.Simple => TilingAndOffset,
-                // while _size of sprite can be different it's UVs stay the same - in range [(0,0) ; (1,1)]
-                // so in this case we want to get ration of size to sprite NativeSize (which should be "default" sprite size depending on it's import data) and then correct Tiling part in that ratio
-                DrawModeType.Tiled => new(TilingAndOffset.xy * Size / nativeSpriteSize, TilingAndOffset.zw),
+                // while size of a sprite can be different it's UVs stay the same - in range [(0,0) ; (1,1)]
+                // so in this case we want to get ratio of size to sprite NativeSize (which should be "default" sprite size depending on it's import data) and then correct Tiling part in that ratio
+                DrawModeType.Tiled => new(TilingAndOffset.xy * Size, TilingAndOffset.zw),
                 
                 _ => throw new ArgumentOutOfRangeException($"{GetType().Name}.{nameof(UVTilingAndOffset)} ({nameof(SpriteRendererAuthoring)}): can't handle draw mode {DrawMode}")
             };

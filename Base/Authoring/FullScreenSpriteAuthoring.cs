@@ -1,5 +1,4 @@
-﻿using NSprites.Authoring;
-using Unity.Entities;
+﻿using Unity.Entities;
 using UnityEngine;
 
 namespace NSprites
@@ -17,7 +16,7 @@ namespace NSprites
                 
                 var entity = GetEntity(TransformUsageFlags.None);
                 AddComponent<FullScreenSpriteTag>(entity);
-                AddComponent(entity, new NativeSpriteSize{ Value = authoring._spriteAuthoring.NativeSpriteSize });
+                AddComponent(entity, new NativeSpriteSize{ Value = authoring._spriteAuthoring.Sprite.GetSize() });
 
                 DependsOn(authoring._spriteAuthoring);
             }
