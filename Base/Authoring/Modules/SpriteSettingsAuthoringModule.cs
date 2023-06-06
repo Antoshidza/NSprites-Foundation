@@ -6,7 +6,7 @@ using UnityEngine;
 namespace NSprites.Authoring
 {
     [Serializable]
-    public class SpriteSettingsModule
+    public class SpriteSettingsAuthoringModule
     {
         public enum DrawModeType
         {
@@ -58,7 +58,7 @@ namespace NSprites.Authoring
         public void TrySetSize(in float2 value)
         {
             if (LockSize)
-                Debug.LogWarning($"{nameof(SpriteSettingsModule)}: can't change size because {nameof(LockSize)} enabled");
+                Debug.LogWarning($"{nameof(SpriteSettingsAuthoringModule)}: can't change size because {nameof(LockSize)} enabled");
             else
                 Size = value;
         }

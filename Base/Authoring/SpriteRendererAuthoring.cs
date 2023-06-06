@@ -29,7 +29,7 @@ namespace NSprites
         [SerializeField] public RegisterSpriteAuthoringModule RegisterSpriteData;
         [SerializeField] public bool OverrideTextureFromSprite = true;
         
-        [SerializeField] public SpriteSettingsModule RenderSettings;
+        [SerializeField] public SpriteSettingsAuthoringModule RenderSettings;
         [SerializeField] public SortingAuthoringModule Sorting;
 
         private bool IsValid

@@ -31,7 +31,7 @@ namespace NSprites
         
         [SerializeField] public AnimationAuthoringModule AnimationAuthoringModule;
         [SerializeField] public RegisterSpriteAuthoringModule RegisterSpriteData;
-        [SerializeField] public SpriteSettingsModule RenderSettings;
+        [SerializeField] public SpriteSettingsAuthoringModule RenderSettings;
         [SerializeField] public SortingAuthoringModule Sorting;
 
         protected virtual bool IsValid
