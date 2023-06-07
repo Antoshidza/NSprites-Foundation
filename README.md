@@ -10,7 +10,7 @@ Also before working with this package please read [NSprites documentation](https
 | **name**                                                                                  | **running** | description                                                            |
 |:------------------------------------------------------------------------------------------|:------------|:-----------------------------------------------------------------------|
 | [Components](https://github.com/Antoshidza/NSprites-Foundation/tree/main/Base/Components) | runtime     | Contains components to be used with NSprites                           |
-| [Render data authoring](About/RenderDataAuthoring.md)                                     | editor      | Bakes basic render data, uses all other parts                          |
+| [Authoring](About/AuthoringWorkflow.md)                                                   | editor      | Bakes basic render data, uses all other parts                          |
 | Render data registration                                                                  | runtime     | Register render data for NSprites render system                        |
 | [Sorting](About/Sorting.md)                                                               | runtime     | Calculate SortingValue depending on 2D position to use in shader       |
 | Culling                                                                                   | runtime     | Disables / Enables rendering based on 2D position relatively to camera |
@@ -21,7 +21,7 @@ Also before working with this package please read [NSprites documentation](https
 Diagram below illustrates dependencies between parts
 <img src="About/NSprites-Foundation-Map.drawio.svg" width="800"/>
 
-## Limitations
+## Probably you should know
 * You can use included shaders only with URP, so before anything rendered you should [import, create and assign URP asset in project settings](https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@14.0/manual/InstallingAndConfiguringURP.html).
 If you want use another render pipeline then you need to implement your own [shader and create material](https://github.com/Antoshidza/NSprites/wiki/Prepare-compatible-material) with it.
 * Some components registered as properties in this package, so by default you will have component properties (you can see them [this window](https://github.com/Antoshidza/NSprites/wiki/Debug-NSprites-data)).
