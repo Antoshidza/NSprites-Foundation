@@ -12,6 +12,7 @@ using Unity.Mathematics;
 
 namespace NSprites
 {
+    // TODO: if user can define any index of a layer, then we should recalculate layers actual indices. So for example layers -1, 1, 2 should become 0, 1, 2. This needed because sorting value should be in [0,1] range, but negative layers will produce negative results
     [BurstCompile]
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
     public partial struct SpriteSortingSystem : ISystem
