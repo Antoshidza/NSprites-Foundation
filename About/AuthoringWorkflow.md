@@ -2,19 +2,17 @@
 This package provides flexible authoring possibilities to serve your purposes.
 
 ### Regular **Authorings**
-The most simple way is to use ready monobehaviour authorings from this package 
-such as [`SpriteRendererAuthoring`](https://github.com/Antoshidza/NSprites-Foundation/blob/main/Base/Authoring/SpriteRendererAuthoring.cs)
-and [`SpriteRendererAuthoring`](https://github.com/Antoshidza/NSprites-Foundation/blob/main/Animation/Authoring/SpriteAnimationAuthoring.cs).
+The most simple way is to use ready monobehaviour authorings from this package.
 Those authorings gives you all data assigning you need to render sprites withing pipeline of this package.
 
-* [SpriteRendererAuthoring](https://github.com/Antoshidza/NSprites-Foundation/blob/main/Base/Authoring/SpriteRendererAuthoring.cs) - bakes default render components. Adds [2D transform](2DTransform.md) components / removes unity default 3D transforms / adds sorting components.
-* [SpriteAnimatedRendererAuthoring]() - same as previous, but also adds animation related components. Though not inherited from previous one (because it hard to keep all in place when you deal with unity serialization) 
+* [`SpriteRendererAuthoring`](../Base/Authoring/SpriteRendererAuthoring.cs) - bakes default render components. Adds [2D transform](2DTransform.md) components / removes unity default 3D transforms / adds sorting components.
+* [`SpriteAnimatedRendererAuthoring`](../Animation/Authoring/SpriteAnimatedRendererAuthoring.cs) - same as previous, but also adds animation related components. Though not inherited from previous one (because it hard to keep all in place when you deal with unity serialization) 
 
 ### Modules
 However you may want to implement your own register system or your own shader or some other components, I can never know.
 So you may want to use authorings partially, for example you want to use only sorting bake part,
 then you can use **Authoring Modules** which is just serialized types with `Bake()` method.
-So you can use [`SortingAuthoringModule`](/Base/Authoring/Modules/SpriteSettingsAuthoringModule.cs)
+So you can use [`SortingAuthoringModule`](/Sorting/Authoring/Modules/SortingAuthoringModule.cs)
 and other modules as a field in your custom authoring `MonoBehaviour` class and call `Bake()` in `Baker<TAuthroing>` like
 ```csharp
 public class FooAuthoring : MonoBehaviour
@@ -63,6 +61,6 @@ public class FooAuthoring : MonoBehaviour
 
 
 # Assets used with authoring workflow
-* [`PropertiesSet`](https://github.com/Antoshidza/NSprites-Foundation/blob/main/Base/Data/PropertiesSet.cs) - contains properties components names with update strategy type (read more about [properties](https://github.com/Antoshidza/NSprites/wiki/Register-components-as-properties) and [update modes](https://github.com/Antoshidza/NSprites/wiki/Property-update-modes)).
+* [`PropertiesSet`](/Base/Data/PropertiesSet.cs) - contains properties components names with update strategy type (read more about [properties](https://github.com/Antoshidza/NSprites/wiki/Register-components-as-properties) and [update modes](https://github.com/Antoshidza/NSprites/wiki/Property-update-modes)).
 This `ScriptableObject` used by **authoring** / **modules** / **extensions** to bake registration data. You can create it by call context menu in project `Create/NSprites/Properties Set`.
 * [`SpriteAnimation`](/Animation/Data/SpriteAnimation.cs) & [`SpriteAnimationSet`](/Animation/Data/SpriteAnimationSet.cs) - scriptable objects, first contains animation data and second contains a set of `SpriteAnimation`
