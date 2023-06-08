@@ -8,12 +8,12 @@ All animation data lives in provided `ScriptableObject`s (mentioned below).
 In baking phase it bakes all immutable animation data into blob (see `SpriteAnimationAuthoring`).
 Then in runtime it changes `UVAtlas` component value over time to perform flipbook animation.
 
-## [`SpriteAnimationAuthoring`](https://github.com/Antoshidza/NSprites-Foundation/blob/main/Animation/Authoring/SpriteAnimationAuthoring.cs)
-Inherited from [`SpriteRenderAuthoring`](https://github.com/Antoshidza/NSprites-Foundation/blob/main/Base/Authoring/SpriteRendererAuthoring.cs) it also bakes all needed animation data provided as [`SpriteAnimationSet`](https://github.com/Antoshidza/NSprites-Foundation/blob/main/Animation/Data/SpriteAnimationSet.cs).
+## [`SpriteAnimatedRendererAuthoring`](../Animation/Authoring/SpriteAnimatedRendererAuthoring.cs)
+Inherited from [`SpriteRenderAuthoring`](/Base/Authoring/SpriteRendererAuthoring.cs) it also bakes all needed animation data provided as [`SpriteAnimationSet`](/Animation/Data/SpriteAnimationSet.cs).
 If you want to implement your own authoring you can still use static methods provided by this class to perform same baking.
 
 ## Prepare assets
-To work with animation part you need to create [`SpriteAnimationSet`](https://github.com/Antoshidza/NSprites-Foundation/blob/main/Animation/Data/SpriteAnimationSet.cs) and bunch of [`SpriteAnimation`](https://github.com/Antoshidza/NSprites-Foundation/blob/main/Animation/Data/SpriteAnimation.cs).
+To work with animation part you need to create [`SpriteAnimationSet`](/Animation/Data/SpriteAnimationSet.cs) and bunch of [`SpriteAnimation`](/Animation/Data/SpriteAnimation.cs).
 You can create them like most of `ScriptableObjects` by calling context menu in project and selecting `Create/NSprites/Animation Set` / `Create/Nsprites/Animation (sprite sequence)`.
 
 ### `SpriteAnimation`
