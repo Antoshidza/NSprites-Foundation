@@ -4,8 +4,6 @@ using Unity.Entities;
 using UnityEngine;
 using static NSprites.MathHelper;
 
-
-
 namespace NSprites
 {
     [WorldSystemFilter(WorldSystemFilterFlags.BakingSystem)]
@@ -23,7 +21,7 @@ namespace NSprites
                 .ForEach((Entity entity, Transform2DRequest transform2D) =>
                 {
                     
-                    Transform transform = transform2D.Source.transform;
+                    var transform = transform2D.Source.transform;
                     if (!NestedEntity(transform.parent, ref entityDebugManager))
                         Convert(transform, entity, Entity.Null, ref ecb, ref entityDebugManager);
                 })
@@ -32,7 +30,6 @@ namespace NSprites
 
             ecb.Playback(EntityManager);
         }
-
 
         private bool TryGetPrimaryEntity(Component comp, out Entity entity, ref EntityManager.EntityManagerDebug entityDebugManager)
         {
@@ -45,14 +42,12 @@ namespace NSprites
             return findAny;
         }
 
-
         private Entity GetPrimaryEntity(Component comp, ref EntityManager.EntityManagerDebug entityDebugManager)
         {
-            return !TryGetPrimaryEntity(comp, out Entity result, ref entityDebugManager)
+            return !TryGetPrimaryEntity(comp, out var result, ref entityDebugManager)
                 ? throw new System.Exception($"There is no converted entities from {comp.gameObject.name} gameobjects")
                 : result;
         }
-
 
         private void Convert(Transform transform, in Entity entity, in Entity parentEntity, ref EntityCommandBuffer ecb, ref EntityManager.EntityManagerDebug entityDebugManager)
         {
@@ -80,18 +75,20 @@ namespace NSprites
                 Convert(child, childEntity, entity, ref ecb, ref entityDebugManager);
             }
         }
-
-
+        
         private bool NestedEntity(Transform parentTransform, ref EntityManager.EntityManagerDebug entityDebugManager)
         {
             // there is no parent at all, so entity isn't nested
-            if (parentTransform == null) return false;
+            if (parentTransform == null)
+                return false;
 
             // if there is no conversion for parent, so entity isn't nested
-            if (!TryGetPrimaryEntity(parentTransform, out Entity parentEntity, ref entityDebugManager)) return false;
+            if (!TryGetPrimaryEntity(parentTransform, out Entity parentEntity, ref entityDebugManager))
+                return false;
 
             // parent has 2D transform which means this entity for sure is nested
-            if (EntityManager.HasComponent<Transform2DRequest>(parentEntity)) return true;
+            if (EntityManager.HasComponent<Transform2DRequest>(parentEntity))
+                return true;
 
             // parent has no 2D transform, but it can have grandparents with 2D transform still, so check recursively
             return NestedEntity(parentTransform.parent, ref entityDebugManager);

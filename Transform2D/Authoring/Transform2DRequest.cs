@@ -1,8 +1,6 @@
 ﻿using Unity.Entities;
 using UnityEngine;
 
-
-
 namespace NSprites
 {
     [TemporaryBakingType]

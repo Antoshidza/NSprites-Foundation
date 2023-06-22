@@ -9,8 +9,6 @@ using quaternion = Unity.Mathematics.quaternion;
 using static NSprites.MathHelper;
 using static Unity.Mathematics.math;
 
-
-
 namespace NSprites
 {
     [BurstCompile]
@@ -34,8 +32,6 @@ namespace NSprites
         [CreateProperty]
         public quaternion Rotation;
 
-        public float3 Position3D => float3(Position.x, Position.y, 0);
-        
         /// <summary>
         /// The identity transform.
         /// </summary>

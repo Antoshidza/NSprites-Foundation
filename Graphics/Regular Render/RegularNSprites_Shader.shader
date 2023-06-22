@@ -1,5 +1,4 @@
-﻿
-Shader "Universal Render Pipeline/2D/SimpleSpriteShader"
+﻿Shader "Universal Render Pipeline/2D/SimpleSpriteShader"
 {
     Properties
     {
