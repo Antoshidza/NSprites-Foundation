@@ -49,7 +49,7 @@ namespace NSprites.Authoring
 
             if (add2DTransform)
             {
-                baker.AddComponentObject(entity, new Transform2DRequest { sourceGameObject = authoring.gameObject });
+                baker.AddComponentObject(entity, new Transform2DRequest { Source = authoring.gameObject });
                 baker.DependsOn(authoring.transform);
             }
         }

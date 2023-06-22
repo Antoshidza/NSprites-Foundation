@@ -59,7 +59,7 @@ namespace NSprites
         private struct GatherSortingDataJob : IJobChunk
         {
             [ReadOnly] public EntityTypeHandle entityTypeHandle;
-            [ReadOnly] public ComponentTypeHandle<WorldPosition2D> worldPosition2D_CTH;
+            [ReadOnly] public ComponentTypeHandle<LocalToWorld2D> worldPosition2D_CTH;
             [ReadOnly] public ComponentTypeHandle<SortingIndex> sortingIndex_CTH;
             [WriteOnly][NativeDisableContainerSafetyRestriction] public NativeArray<SortingData> sortingDataArray;
             [WriteOnly][NativeDisableContainerSafetyRestriction] public NativeArray<int> pointers;
@@ -76,7 +76,7 @@ namespace NSprites
                     var arrayIndex = firstEntityIndex + entityIndex;
                     sortingDataArray[arrayIndex] = new SortingData
                     {
-                        position = worldPosition2DArray[entityIndex].value,
+                        position = worldPosition2DArray[entityIndex].Position,
                         sortingIndex = sortingIndexes[entityIndex].value,
                         id = entityArray[entityIndex].Index
                     };
@@ -160,7 +160,7 @@ namespace NSprites
             var gatherSortingDataJob = new GatherSortingDataJob
             {
                 entityTypeHandle = SystemAPI.GetEntityTypeHandle(),
-                worldPosition2D_CTH = SystemAPI.GetComponentTypeHandle<WorldPosition2D>(true),
+                worldPosition2D_CTH = SystemAPI.GetComponentTypeHandle<LocalToWorld2D>(true),
                 sortingIndex_CTH = SystemAPI.GetComponentTypeHandle<SortingIndex>(true),
                 pointers = dataPointers,
                 sortingDataArray = sortingDataArray,
@@ -214,7 +214,7 @@ namespace NSprites
             var systemData = new SystemData();
             var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
                 .WithNone<CullSpriteTag>()
-                .WithAll<WorldPosition2D>()
+                .WithAll<LocalToWorld2D>()
                 .WithAll<SortingValue>()
                 .WithAll<SortingIndex>()
                 .WithAll<SortingLayer>()
@@ -225,7 +225,7 @@ namespace NSprites
             queryBuilder.Reset();
             _ = queryBuilder
                 .WithNone<CullSpriteTag>()
-                .WithAll<WorldPosition2D>()
+                .WithAll<LocalToWorld2D>()
                 .WithAll<SortingValue>()
                 .WithAll<SortingIndex>()
                 .WithAll<SortingLayer>()

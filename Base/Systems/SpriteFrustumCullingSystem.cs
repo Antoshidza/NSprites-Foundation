@@ -17,10 +17,10 @@ namespace NSprites
             public EntityCommandBuffer.ParallelWriter EntityCommandBuffer;
             public Bounds2D CameraBounds2D;
 
-            private void Execute(Entity entity, [ChunkIndexInQuery]int chunkIndex, in WorldPosition2D worldPosition, in Scale2D size, in Pivot pivot)
+            private void Execute(Entity entity, [ChunkIndexInQuery]int chunkIndex, in LocalToWorld2D worldPosition, in Scale2D size, in Pivot pivot)
             {
-                var viewCenterPosition = worldPosition.value - size.value * pivot.value + size.value * .5f;
-                if(!CameraBounds2D.Intersects(new Bounds2D(viewCenterPosition, size.value)))
+                var bounds = Bounds2D.From(worldPosition, size, pivot);
+                if(!CameraBounds2D.Intersects(bounds))
                     EntityCommandBuffer.AddComponent<CullSpriteTag>(chunkIndex, entity);
             }
         }
@@ -32,10 +32,10 @@ namespace NSprites
             public EntityCommandBuffer.ParallelWriter EntityCommandBuffer;
             public Bounds2D CameraBounds2D;
 
-            private void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndex, in WorldPosition2D worldPosition, in Scale2D size, in Pivot pivot)
+            private void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndex, in LocalToWorld2D worldPosition, in Scale2D size, in Pivot pivot)
             {
-                var viewCenterPosition = worldPosition.value - size.value * pivot.value + size.value * .5f;
-                if (CameraBounds2D.Intersects(new Bounds2D(viewCenterPosition, size.value)))
+                var bounds = Bounds2D.From(worldPosition, size, pivot);
+                if (CameraBounds2D.Intersects(bounds))
                     EntityCommandBuffer.RemoveComponent<CullSpriteTag>(chunkIndex, entity);
             }
         }
