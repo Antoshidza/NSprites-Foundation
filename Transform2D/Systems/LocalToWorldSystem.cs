@@ -8,8 +8,6 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using static Unity.Mathematics.math;
 
-
-
 namespace NSprites
 {
     /// <summary>

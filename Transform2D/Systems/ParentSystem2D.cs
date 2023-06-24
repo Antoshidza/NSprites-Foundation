@@ -7,8 +7,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Profiling;
-
-
+using Unity.Transforms;
 
 namespace NSprites
 {
@@ -17,6 +16,7 @@ namespace NSprites
     /// </summary>
     [BurstCompile]
     [RequireMatchingQueriesForUpdate]
+    [UpdateInGroup(typeof(TransformSystemGroup))]
     public partial struct ParentSystem2D : ISystem
     {
         private EntityQuery mNewParentsQuery;
