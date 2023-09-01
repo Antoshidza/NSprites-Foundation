@@ -59,9 +59,8 @@ namespace NSprites
 
             if (parentEntity != Entity.Null) {
                 ecb.AddComponent(entity, new Parent2D {Value = parentEntity});
-                _ = EntityManager.HasComponent<Child2D>(parentEntity)
-                    ? SystemAPI.GetBuffer<Child2D>(parentEntity)
-                    : ecb.AddBuffer<Child2D>(parentEntity);
+                if(!EntityManager.HasComponent<Child2D>(parentEntity))
+                    ecb.AddBuffer<Child2D>(parentEntity);
             }
 
             for (int i = 0; i < transform.childCount; i++) {
