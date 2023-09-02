@@ -142,7 +142,14 @@ namespace NSprites
         private const int LayerCount = 8;
         private const float PerLayerOffset = 1f / LayerCount;
 
-        private JobHandle RegularSort(in EntityQuery sortingQuery, int sortingLayer, ref SystemState state)
+        struct SystemAPIData
+        {
+            public EntityTypeHandle entityTypeHandle;
+            public ComponentTypeHandle<LocalToWorld2D> componentTypeHandleL2W;
+            public ComponentTypeHandle<SortingIndex> componentTypeHandleSI;
+            public ComponentTypeHandle<SortingValue> componentTypeHandleSV;   
+        }
+        private JobHandle RegularSort(in EntityQuery sortingQuery, int sortingLayer, ref SystemState state, in SystemAPIData systemAPIData)
         {
             var spriteEntitiesCount = sortingQuery.CalculateEntityCount();
 
@@ -159,9 +166,9 @@ namespace NSprites
 
             var gatherSortingDataJob = new GatherSortingDataJob
             {
-                entityTypeHandle = SystemAPI.GetEntityTypeHandle(),
-                worldPosition2D_CTH = SystemAPI.GetComponentTypeHandle<LocalToWorld2D>(true),
-                sortingIndex_CTH = SystemAPI.GetComponentTypeHandle<SortingIndex>(true),
+                entityTypeHandle = systemAPIData.entityTypeHandle,
+                worldPosition2D_CTH = systemAPIData.componentTypeHandleL2W,
+                sortingIndex_CTH = systemAPIData.componentTypeHandleSI,
                 pointers = dataPointers,
                 sortingDataArray = sortingDataArray,
                 chunkBasedEntityIndices = chunkBaseEntityIndices
@@ -195,7 +202,7 @@ namespace NSprites
             var writeBackChunkDataJob = new WriteSortingValuesToChunksJob
             {
                 sortingValues = sortingValues,
-                sortingValue_CTH_WO = SystemAPI.GetComponentTypeHandle<SortingValue>(false),
+                sortingValue_CTH_WO = systemAPIData.componentTypeHandleSV,
                 chunkBasedEntityIndices = chunkBaseEntityIndices
             };
             var writeBackChunkDataHandle = writeBackChunkDataJob.ScheduleParallelByRef(sortingQuery, genSortingValuesJob);
@@ -264,7 +271,13 @@ namespace NSprites
                 {
                     var sortingLayer = sortingLayers[i];
                     systemData.sortingSpritesQuery.SetSharedComponentFilter(sortingLayer);
-                    handles[i] = RegularSort(systemData.sortingSpritesQuery, sortingLayer.index, ref state);
+                    SystemAPIData systemAPIData = new SystemAPIData() {
+                        entityTypeHandle =  SystemAPI.GetEntityTypeHandle(),
+                        componentTypeHandleL2W = SystemAPI.GetComponentTypeHandle<LocalToWorld2D>(true),
+                        componentTypeHandleSI = SystemAPI.GetComponentTypeHandle<SortingIndex>(true),
+                        componentTypeHandleSV = SystemAPI.GetComponentTypeHandle<SortingValue>(false)
+                    };
+                    handles[i] = RegularSort(systemData.sortingSpritesQuery, sortingLayer.index, ref state, systemAPIData);
                 }
             }
 
@@ -274,7 +287,13 @@ namespace NSprites
                 {
                     var sortingLayer = sortingLayers[i];
                     systemData.sortingStaticSpritesQuery.SetSharedComponentFilter(sortingLayer);
-                    handles[staticHandlesOffset + i] = RegularSort(systemData.sortingStaticSpritesQuery, sortingLayer.index, ref state);
+                    SystemAPIData systemAPIData = new SystemAPIData() {
+                        entityTypeHandle =  SystemAPI.GetEntityTypeHandle(),
+                        componentTypeHandleL2W = SystemAPI.GetComponentTypeHandle<LocalToWorld2D>(true),
+                        componentTypeHandleSI = SystemAPI.GetComponentTypeHandle<SortingIndex>(true),
+                        componentTypeHandleSV = SystemAPI.GetComponentTypeHandle<SortingValue>(false)
+                    };
+                    handles[staticHandlesOffset + i] = RegularSort(systemData.sortingStaticSpritesQuery, sortingLayer.index, ref state, systemAPIData);
                 }
             }
 
@@ -282,3 +301,4 @@ namespace NSprites
         }
     }
 }
+
