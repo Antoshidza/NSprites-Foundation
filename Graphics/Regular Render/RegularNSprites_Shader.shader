@@ -75,9 +75,9 @@
             {
 #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
                 int propertyIndex = _propertyPointers[unity_InstanceID];
-                float4x4 transform = _positionBuffer[propertyIndex];
-                float2 pivot = _pivotBuffer[propertyIndex];
-                float2 scale = _heightWidthBuffer[propertyIndex];
+                float4x4 transform = _positionBuffer[unity_InstanceID];
+                float2 pivot = _pivotBuffer[unity_InstanceID];
+                float2 scale = _heightWidthBuffer[unity_InstanceID];
                 unity_ObjectToWorld = mul(transform, offset_matrix(pivot, scale));
 #endif
             }
@@ -92,9 +92,9 @@
 
 #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
                 int propertyIndex = _propertyPointers[instanceID];
-                float4 uvTilingAndOffset = _uvTilingAndOffsetBuffer[propertyIndex];
-                float sortingValue = _sortingValueBuffer[propertyIndex];
-                int2 flipValue = _flipBuffer[propertyIndex];
+                float4 uvTilingAndOffset = _uvTilingAndOffsetBuffer[instanceID];
+                float sortingValue = _sortingValueBuffer[instanceID];
+                int2 flipValue = _flipBuffer[instanceID];
 #else
                 float4 uvTilingAndOffset = float4(1, 1, 0, 0);
                 float sortingValue = 0;
@@ -122,7 +122,7 @@
             {
 #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
                 int propertyIndex = _propertyPointers[instanceID];
-                float4 uvAtlas = _uvAtlasBuffer[propertyIndex];
+                float4 uvAtlas = _uvAtlasBuffer[instanceID];
 #else
                 float4 uvAtlas = float4(1, 1, 0, 0);
 #endif
