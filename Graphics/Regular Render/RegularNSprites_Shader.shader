@@ -1,4 +1,17 @@
-﻿Shader "Universal Render Pipeline/2D/SimpleSpriteShader"
+﻿// To access properties data shader uses StructuredBuffer<T> down below
+
+// If you use EachUpdate mode then just access _bufferName[instanceID] (instanceID may be named differently)
+
+// If you use Reactive / Static mode then for such properties you firstly need to obtain instance provided by NSprites system
+// to do that you need to access _propertyPointers[instanceID] and use it like it is your actual instance id, so
+// any Reactive / Static properties should be accessed like:
+// int pointer = _propertyPointers[instanceID];
+// float propertyValue _propertyNameBuffer[pointer]; // float type is here just for example
+
+// NOTE: some graphics API have problems with how NSprites updates Reactive / Static properties, if you encountered such situation,
+// then try to use only EachUpdate mode and access buffers like it described in first section
+
+Shader "Universal Render Pipeline/2D/SimpleSpriteShader"
 {
     Properties
     {
@@ -29,7 +42,7 @@
             #pragma fragment UnlitFragment
 
             #pragma target 4.5
-            #pragma exclude_renderers gles gles3 glcore
+            //#pragma exclude_renderers gles gles3 glcore
             #pragma multi_compile_instancing
             #pragma instancing_options procedural:setup
 
@@ -75,9 +88,9 @@
             {
 #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
                 int propertyIndex = _propertyPointers[unity_InstanceID];
-                float4x4 transform = _positionBuffer[unity_InstanceID];
-                float2 pivot = _pivotBuffer[unity_InstanceID];
-                float2 scale = _heightWidthBuffer[unity_InstanceID];
+                float4x4 transform = _positionBuffer[propertyIndex];
+                float2 pivot = _pivotBuffer[propertyIndex];
+                float2 scale = _heightWidthBuffer[propertyIndex];
                 unity_ObjectToWorld = mul(transform, offset_matrix(pivot, scale));
 #endif
             }
@@ -92,9 +105,9 @@
 
 #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
                 int propertyIndex = _propertyPointers[instanceID];
-                float4 uvTilingAndOffset = _uvTilingAndOffsetBuffer[instanceID];
-                float sortingValue = _sortingValueBuffer[instanceID];
-                int2 flipValue = _flipBuffer[instanceID];
+                float4 uvTilingAndOffset = _uvTilingAndOffsetBuffer[propertyIndex];
+                float sortingValue = _sortingValueBuffer[propertyIndex];
+                int2 flipValue = _flipBuffer[propertyIndex];
 #else
                 float4 uvTilingAndOffset = float4(1, 1, 0, 0);
                 float sortingValue = 0;
@@ -122,7 +135,7 @@
             {
 #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
                 int propertyIndex = _propertyPointers[instanceID];
-                float4 uvAtlas = _uvAtlasBuffer[instanceID];
+                float4 uvAtlas = _uvAtlasBuffer[propertyIndex];
 #else
                 float4 uvAtlas = float4(1, 1, 0, 0);
 #endif
