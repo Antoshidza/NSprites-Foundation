@@ -17,6 +17,7 @@ namespace NSprites
     [BurstCompile]
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(TransformSystemGroup))]
+    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
     public partial struct ParentSystem2D : ISystem
     {
         private EntityQuery mNewParentsQuery;
