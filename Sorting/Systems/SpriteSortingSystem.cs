@@ -244,10 +244,7 @@ namespace NSprites
 
             queryBuilder.Dispose();
         }
-
-        public void OnDestroy(ref SystemState state)
-        {
-        }
+        
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
@@ -267,11 +264,11 @@ namespace NSprites
 
             if (!sortingSpritesIsEmpty)
             {
-                for (int i = 0; i < sortingLayers.Length; i++)
+                for (var i = 0; i < sortingLayers.Length; i++)
                 {
                     var sortingLayer = sortingLayers[i];
                     systemData.sortingSpritesQuery.SetSharedComponentFilter(sortingLayer);
-                    SystemAPIData systemAPIData = new SystemAPIData() {
+                    var systemAPIData = new SystemAPIData {
                         entityTypeHandle =  SystemAPI.GetEntityTypeHandle(),
                         componentTypeHandleL2W = SystemAPI.GetComponentTypeHandle<LocalToWorld2D>(true),
                         componentTypeHandleSI = SystemAPI.GetComponentTypeHandle<SortingIndex>(true),
@@ -283,11 +280,11 @@ namespace NSprites
 
             if (!sortingStaticSpritesIsEmpty)
             {
-                for (int i = 0; i < sortingLayers.Length; i++)
+                for (var i = 0; i < sortingLayers.Length; i++)
                 {
                     var sortingLayer = sortingLayers[i];
                     systemData.sortingStaticSpritesQuery.SetSharedComponentFilter(sortingLayer);
-                    SystemAPIData systemAPIData = new SystemAPIData() {
+                    var systemAPIData = new SystemAPIData {
                         entityTypeHandle =  SystemAPI.GetEntityTypeHandle(),
                         componentTypeHandleL2W = SystemAPI.GetComponentTypeHandle<LocalToWorld2D>(true),
                         componentTypeHandleSI = SystemAPI.GetComponentTypeHandle<SortingIndex>(true),
