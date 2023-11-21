@@ -2,6 +2,7 @@
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEditor;
 
 namespace NSprites
@@ -17,7 +18,7 @@ namespace NSprites
             public EntityCommandBuffer.ParallelWriter EntityCommandBuffer;
             public Bounds2D CameraBounds2D;
 
-            private void Execute(Entity entity, [ChunkIndexInQuery]int chunkIndex, in LocalToWorld2D worldPosition, in Scale2D size, in Pivot pivot)
+            private void Execute(Entity entity, [ChunkIndexInQuery]int chunkIndex, in LocalToWorld worldPosition, in Scale2D size, in Pivot pivot)
             {
                 var bounds = Bounds2D.From(worldPosition, size, pivot);
                 if(!CameraBounds2D.Intersects(bounds))
@@ -32,7 +33,7 @@ namespace NSprites
             public EntityCommandBuffer.ParallelWriter EntityCommandBuffer;
             public Bounds2D CameraBounds2D;
 
-            private void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndex, in LocalToWorld2D worldPosition, in Scale2D size, in Pivot pivot)
+            private void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndex, in LocalToWorld worldPosition, in Scale2D size, in Pivot pivot)
             {
                 var bounds = Bounds2D.From(worldPosition, size, pivot);
                 if (CameraBounds2D.Intersects(bounds))
@@ -83,7 +84,6 @@ namespace NSprites
             };
             var disableCulledHandle = disableCulledJob.ScheduleParallelByRef(state.Dependency);
             
-
             var enableUnculledJob = new EnableUnculledJob
             {
                 EntityCommandBuffer = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),

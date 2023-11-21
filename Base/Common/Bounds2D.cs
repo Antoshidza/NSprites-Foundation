@@ -1,5 +1,6 @@
 ﻿using System;
 using Unity.Mathematics;
+using Unity.Transforms;
 
 namespace NSprites
 {
@@ -66,10 +67,10 @@ namespace NSprites
                    min.y <= anotherMax.y && max.y >= anotherMin.y;
         }
         
-        public static Bounds2D From(in LocalToWorld2D ltw, in Scale2D size, in Pivot pivot)
+        public static Bounds2D From(in LocalToWorld ltw, in Scale2D size, in Pivot pivot)
         {
             var rotation = MathHelper.euler(ltw.Rotation).z;
-            var scale = ltw.Scale * size.value;
+            var scale = size.value;
             var localCenter= -scale * pivot.value + scale * .5f;
 
             var sin = math.sin(rotation);
@@ -85,7 +86,7 @@ namespace NSprites
                 => new(v.x * cos - v.y * sin, v.x * sin + v.y * cos);
 
             var adjustedScale = RotateScale2D(sin, cos, scale);
-            var position = ltw.Position + RotateFloat2(sin, cos, localCenter);
+            var position = ltw.Position.xy + RotateFloat2(sin, cos, localCenter);
     
             return new Bounds2D(position, adjustedScale);
         }

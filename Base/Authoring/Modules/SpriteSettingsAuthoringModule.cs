@@ -44,7 +44,7 @@ namespace NSprites.Authoring
             
             baker.BakeSpriteRender
             (
-                baker.GetEntity(TransformUsageFlags.None),
+                baker.GetEntity(TransformUsageFlags.Dynamic),
                 authoring,
                 uvAtlas,
                 GetTilingAndOffsetByDrawMode(),

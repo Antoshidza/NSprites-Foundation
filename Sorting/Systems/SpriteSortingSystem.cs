@@ -7,6 +7,7 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Transforms;
 
 [assembly: RegisterGenericJobType(typeof(SpriteSortingSystem.SortArrayJob<int, SpriteSortingSystem.SortingDataComparer>))]
 
@@ -59,7 +60,7 @@ namespace NSprites
         private struct GatherSortingDataJob : IJobChunk
         {
             [ReadOnly] public EntityTypeHandle entityTypeHandle;
-            [ReadOnly] public ComponentTypeHandle<LocalToWorld2D> worldPosition2D_CTH;
+            [ReadOnly] public ComponentTypeHandle<LocalToWorld> worldPosition2D_CTH;
             [ReadOnly] public ComponentTypeHandle<SortingIndex> sortingIndex_CTH;
             [WriteOnly][NativeDisableContainerSafetyRestriction] public NativeArray<SortingData> sortingDataArray;
             [WriteOnly][NativeDisableContainerSafetyRestriction] public NativeArray<int> pointers;
@@ -68,7 +69,7 @@ namespace NSprites
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
                 var entityArray = chunk.GetNativeArray(entityTypeHandle);
-                var worldPosition2DArray = chunk.GetNativeArray(ref worldPosition2D_CTH);
+                var worldPositionArray = chunk.GetNativeArray(ref worldPosition2D_CTH);
                 var sortingIndexes = chunk.GetNativeArray(ref sortingIndex_CTH);
                 var firstEntityIndex = chunkBasedEntityIndices[unfilteredChunkIndex];
                 for (int entityIndex = 0; entityIndex < entityArray.Length; entityIndex++)
@@ -76,7 +77,7 @@ namespace NSprites
                     var arrayIndex = firstEntityIndex + entityIndex;
                     sortingDataArray[arrayIndex] = new SortingData
                     {
-                        position = worldPosition2DArray[entityIndex].Position,
+                        position = worldPositionArray[entityIndex].Position.xy,
                         sortingIndex = sortingIndexes[entityIndex].value,
                         id = entityArray[entityIndex].Index
                     };
@@ -145,7 +146,7 @@ namespace NSprites
         struct SystemAPIData
         {
             public EntityTypeHandle entityTypeHandle;
-            public ComponentTypeHandle<LocalToWorld2D> componentTypeHandleL2W;
+            public ComponentTypeHandle<LocalToWorld> componentTypeHandleLTW;
             public ComponentTypeHandle<SortingIndex> componentTypeHandleSI;
             public ComponentTypeHandle<SortingValue> componentTypeHandleSV;   
         }
@@ -167,7 +168,7 @@ namespace NSprites
             var gatherSortingDataJob = new GatherSortingDataJob
             {
                 entityTypeHandle = systemAPIData.entityTypeHandle,
-                worldPosition2D_CTH = systemAPIData.componentTypeHandleL2W,
+                worldPosition2D_CTH = systemAPIData.componentTypeHandleLTW,
                 sortingIndex_CTH = systemAPIData.componentTypeHandleSI,
                 pointers = dataPointers,
                 sortingDataArray = sortingDataArray,
@@ -221,7 +222,7 @@ namespace NSprites
             var systemData = new SystemData();
             var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
                 .WithNone<CullSpriteTag>()
-                .WithAll<LocalToWorld2D>()
+                .WithAll<LocalToWorld>()
                 .WithAll<SortingValue>()
                 .WithAll<SortingIndex>()
                 .WithAll<SortingLayer>()
@@ -232,7 +233,7 @@ namespace NSprites
             queryBuilder.Reset();
             _ = queryBuilder
                 .WithNone<CullSpriteTag>()
-                .WithAll<LocalToWorld2D>()
+                .WithAll<LocalToWorld>()
                 .WithAll<SortingValue>()
                 .WithAll<SortingIndex>()
                 .WithAll<SortingLayer>()
@@ -270,7 +271,7 @@ namespace NSprites
                     systemData.sortingSpritesQuery.SetSharedComponentFilter(sortingLayer);
                     var systemAPIData = new SystemAPIData {
                         entityTypeHandle =  SystemAPI.GetEntityTypeHandle(),
-                        componentTypeHandleL2W = SystemAPI.GetComponentTypeHandle<LocalToWorld2D>(true),
+                        componentTypeHandleLTW = SystemAPI.GetComponentTypeHandle<LocalToWorld>(true),
                         componentTypeHandleSI = SystemAPI.GetComponentTypeHandle<SortingIndex>(true),
                         componentTypeHandleSV = SystemAPI.GetComponentTypeHandle<SortingValue>(false)
                     };
@@ -286,7 +287,7 @@ namespace NSprites
                     systemData.sortingStaticSpritesQuery.SetSharedComponentFilter(sortingLayer);
                     var systemAPIData = new SystemAPIData {
                         entityTypeHandle =  SystemAPI.GetEntityTypeHandle(),
-                        componentTypeHandleL2W = SystemAPI.GetComponentTypeHandle<LocalToWorld2D>(true),
+                        componentTypeHandleLTW = SystemAPI.GetComponentTypeHandle<LocalToWorld>(true),
                         componentTypeHandleSI = SystemAPI.GetComponentTypeHandle<SortingIndex>(true),
                         componentTypeHandleSV = SystemAPI.GetComponentTypeHandle<SortingValue>(false)
                     };

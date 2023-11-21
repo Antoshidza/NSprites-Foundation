@@ -1,6 +1,7 @@
 ﻿using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 
 namespace NSprites
 {
@@ -14,11 +15,11 @@ namespace NSprites
             public float2 CameraPosition;
             public float2 ScreenSize;
             
-            private void Execute(ref Scale2D scale, ref LocalTransform2D transform, ref UVTilingAndOffset uvTilingAndOffset, in NativeSpriteSize nativeSpriteSize)
+            private void Execute(ref Scale2D scale, ref LocalTransform transform, ref UVTilingAndOffset uvTilingAndOffset, in NativeSpriteSize nativeSpriteSize)
             {
                 scale.value = ScreenSize;
                 transform.Scale = 1;
-                transform.Position = CameraPosition;
+                transform.Position = new float3(CameraPosition.x, CameraPosition.y, 0f);
                 uvTilingAndOffset.value = new float4(ScreenSize / nativeSpriteSize.Value, CameraPosition / nativeSpriteSize.Value - ScreenSize / nativeSpriteSize.Value / 2f);
             }
         }

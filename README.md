@@ -15,7 +15,6 @@ Also before working with this package please read [NSprites documentation](https
 | [Sorting](About/Sorting.md)                                                               | runtime     | Calculate SortingValue depending on 2D position to use in shader       |
 | Culling                                                                                   | runtime     | Disables / Enables rendering based on 2D position relatively to camera |
 | [Animation](About/Animation.md)                                                           | runtime     | Shifts UVs values to simulate sprite animation                         |
-| [2D Transform](About/2DTransform.md)                                                      | both        | Provides systems / components to simulate 2D transforms                |
 | Graphics                                                                                  | runtime     | Provides shaders / materials / other render assets                     |
 
 Diagram below illustrates dependencies between parts
