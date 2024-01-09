@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Unity.Collections;
+﻿using Unity.Collections;
 using Unity.Entities;
 
 namespace NSprites
@@ -9,7 +8,6 @@ namespace NSprites
     {
         private EntityQuery _renderArchetypeToRegisterQuery;
         private EntityQuery _renderArchetypeIndexLessEntitiesQuery;
-        private HashSet<int> _registeredIDsSet = new();
 
         protected override void OnCreate()
         {
@@ -42,9 +40,15 @@ namespace NSprites
                  }
             );
     }
+        
         protected override void OnUpdate()
         {
             EntityManager.AddComponent<SpriteRenderID>(_renderArchetypeIndexLessEntitiesQuery);
+
+            Register(_renderArchetypeToRegisterQuery.ToEntityArray(Allocator.Temp));
+
+            EntityManager.RemoveComponent<SpriteRenderDataToRegister>(_renderArchetypeToRegisterQuery);
+            return;
 
             void Register(in NativeArray<Entity> entities)
             {
@@ -56,8 +60,7 @@ namespace NSprites
                     var entity = entities[i];
                     var renderData = EntityManager.GetComponentObject<SpriteRenderDataToRegister>(entity);
 
-                    if (!_registeredIDsSet.Contains(renderData.data.ID))
-                    {
+                    if (!renderArchetypeStorage.ContainsRender(renderData.data.ID))
                         renderArchetypeStorage.RegisterRender
                         (
                             renderData.data.ID,
@@ -66,15 +69,10 @@ namespace NSprites
                             initialCapacity: 128,
                             capacityStep: 128
                         );
-                        _ = _registeredIDsSet.Add(renderData.data.ID);
-                    }
 
                     EntityManager.SetSharedComponentManaged(entity, new SpriteRenderID { id = renderData.data.ID });
                 }
             }
-            Register(_renderArchetypeToRegisterQuery.ToEntityArray(Allocator.Temp));
-
-            EntityManager.RemoveComponent<SpriteRenderDataToRegister>(_renderArchetypeToRegisterQuery);
         }
     }
 }
