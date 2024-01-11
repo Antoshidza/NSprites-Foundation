@@ -29,7 +29,7 @@ If you don't want to have default registered components you can exclude manifest
 
 ## Installation
 ### Requirements
-* [NSprites v3.2.0+](https://github.com/Antoshidza/NSprites)
+* [NSprites v4.0.0+](https://github.com/Antoshidza/NSprites)
 * Unity v2022.2.3+
 * Universal RP v14.0.6+
 * Entities v1.0.0-pre.65+
