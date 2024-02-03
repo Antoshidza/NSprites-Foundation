@@ -6,10 +6,13 @@ namespace NSprites
     public struct SpriteAnimationBlobData
     {
         public int ID;
-        public float2 Scale2D; // TODO: remove or use
         public float4 UVAtlas;
         public int2 GridSize;
+        public int2 FrameRange;
         public BlobArray<float> FrameDurations;
         public float AnimationDuration;
+
+        public int FrameOffset => FrameRange.x;
+        public int FrameCount => FrameRange.y;
     }
 }

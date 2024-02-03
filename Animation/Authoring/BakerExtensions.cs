@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿using System.Linq;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -42,17 +43,16 @@ namespace NSprites.Authoring
             foreach (var anim in animations)
             {
                 var animData = anim.data;
-                var animationDuration = 0f;
-                for (int i = 0; i < animData.FrameDurations.Length; i++)
-                    animationDuration += animData.FrameDurations[i];
 
                 animationArray[animIndex] = new SpriteAnimationBlobData
                 {
                     ID = Animator.StringToHash(anim.name),
                     GridSize = animData.FrameCount,
+                    FrameRange = animData.FrameRange.IsDefault
+                        ? new int2(0, animData.FrameCount.x * animData.FrameCount.y)
+                        : animData.FrameRange,
                     UVAtlas = NSpritesUtils.GetTextureST(animData.SpriteSheet),
-                    Scale2D = new float2(animData.SpriteSheet.bounds.size.x, animData.SpriteSheet.bounds.size.y),
-                    AnimationDuration = animationDuration
+                    AnimationDuration = animData.FrameDurations.Sum()
                     // FrameDuration - allocate lately
                 };
 
