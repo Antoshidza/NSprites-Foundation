@@ -1,5 +1,6 @@
 ﻿using NSprites.Authoring;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace NSprites
@@ -20,7 +21,8 @@ namespace NSprites
                 DependsOn(authoring);
 
                 authoring.RegisterSpriteData.Bake(this, authoring.OverrideTextureFromSprite ? authoring.Sprite.texture : null);
-                authoring.RenderSettings.Bake(this, authoring, authoring.Sprite.GetSize(), NSpritesUtils.GetTextureST(authoring.Sprite));
+                var uvAtlas = (float4)NSpritesUtils.GetTextureST(authoring.Sprite);
+                authoring.RenderSettings.Bake(this, authoring, authoring.Sprite.GetNativeSize(uvAtlas.xy), uvAtlas);
                 authoring.Sorting.Bake(this);
             }
         }
