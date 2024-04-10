@@ -1,24 +1,24 @@
-﻿# NSprites Foundation
+# NSprites Foundation
 
-This package provides various solutions for dots sprite rendering based on the [NSprites](https://github.com/Antoshidza/NSprites) package. While NSprites tries to be a flexible solution for any needs this project is more like a set of samples and useful tools which may not be perfect for your personal needs.
+This package provides various solutions for Unity DOTS sprite rendering based on the [NSprites](https://github.com/Antoshidza/NSprites) package. While NSprites tries to be a flexible solution for all of your 2D sprite rendering needs, this project is more like a set of samples and useful tools. These tools may or may not be perfect for your use-case.
 
 ## How to use
 
 I would recommend downloading this as an embedded package and adapting it to your needs. You can use most parts separately except those which depend on each other (details below). You can also implement your own tools on top of those or from scratch looking here for an example.
 
-Also, before working with this package please read the [NSprites documentation](https://github.com/Antoshidza/NSprites/wiki) to understand what is going on (or use without editing :D)
+Also, before working with this package please read the [NSprites documentation](https://github.com/Antoshidza/NSprites/wiki) to understand what is going on (or use this package without editing :D)
 
 ## Content
 
-| **name**                                                                                  | **running** | description                                                            |
-| :---------------------------------------------------------------------------------------- | :---------- | :--------------------------------------------------------------------- |
-| [Components](https://github.com/Antoshidza/NSprites-Foundation/tree/main/Base/Components) | runtime     | Contains components to be used with NSprites                           |
-| [Authoring](About/AuthoringWorkflow.md)                                                   | editor      | Bakes basic render data, uses all other parts                          |
-| Render data registration                                                                  | runtime     | Register render data for NSprites render system                        |
-| [Sorting](About/Sorting.md)                                                               | runtime     | Calculate SortingValue depending on 2D position to use in shader       |
-| Culling                                                                                   | runtime     | Disables / Enables rendering based on 2D position relatively to camera |
-| [Animation](About/Animation.md)                                                           | runtime     | Shifts UVs values to simulate sprite animation                         |
-| Graphics                                                                                  | runtime     | Provides shaders / materials / other render assets                     |
+| **name**                                                                                  | **running** | description                                                               |
+| :---------------------------------------------------------------------------------------- | :---------- | :------------------------------------------------------------------------ |
+| [Components](https://github.com/Antoshidza/NSprites-Foundation/tree/main/Base/Components) | runtime     | Contains components to be used with NSprites                              |
+| [Authoring](About/AuthoringWorkflow.md)                                                   | editor      | Bakes basic render data, uses all other parts                             |
+| Render data registration                                                                  | runtime     | Register render data for NSprites render system                           |
+| [Sorting](About/Sorting.md)                                                               | runtime     | Calculate SortingValue depending on 2D position to use in shader          |
+| Culling                                                                                   | runtime     | Disables or Enables rendering based on 2D position relative to the camera |
+| [Animation](About/Animation.md)                                                           | runtime     | Shifts UV values to simulate sprite animation                             |
+| Graphics                                                                                  | runtime     | Provides shaders / materials / other render assets                        |
 
 The diagram below illustrates the dependencies between parts:
 <img src="About/NSprites-Foundation-Map.drawio.svg" width="800"/>
