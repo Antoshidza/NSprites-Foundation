@@ -48,7 +48,7 @@ The diagram below illustrates the dependencies between parts:
 ### Install via git submodule
 
 - `cd` to your project's `/Packages` folder
-- run `git submodule https://github.com/Antoshidza/NSprites-Foundation.git`
+- Run `git submodule https://github.com/Antoshidza/NSprites-Foundation.git`
 
 ### Install via .unitypackage (recommended)
 
