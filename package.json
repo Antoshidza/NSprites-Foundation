@@ -1,6 +1,6 @@
 {
   "name": "com.tonymax.nsprites.foundation",
-  "version": "7.0.0",
+  "version": "8.0.0",
   "displayName": "NSprites Foundation",
   "description": "Contains solutions based on NSprites package such as authoring sprite data, animation, sorting, culling systems.",
   "unity": "2022.2",
