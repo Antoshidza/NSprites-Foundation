@@ -67,12 +67,17 @@ Shader "Universal Render Pipeline/2D/SimpleSpriteShader"
             StructuredBuffer<int> _propertyPointers;
             StructuredBuffer<float4> _uvTilingAndOffsetBuffer;
             StructuredBuffer<float4> _uvAtlasBuffer;
-            StructuredBuffer<float> _sortingValueBuffer;
+            StructuredBuffer<int2> _sortingDataBuffer; // x layer, y sorting index
             StructuredBuffer<float4x4> _positionBuffer;
             StructuredBuffer<float2> _pivotBuffer;
             StructuredBuffer<float2> _heightWidthBuffer;
             StructuredBuffer<int2> _flipBuffer;
 #endif
+
+            // if you use this shader outside from NSprites-Foundation package please make sure you set this global variable
+            // x - per-layer offset
+            // y - per-sorting-index offset
+            float4 _sortingGlobalData;
 
             float4x4 offset_matrix(const float2 input, const float2 scale)
             {
@@ -99,6 +104,7 @@ Shader "Universal Render Pipeline/2D/SimpleSpriteShader"
             {
                 return UV * Tiling + Offset;
             }
+            
             Varyings UnlitVertex(Attributes attributes, uint instanceID : SV_InstanceID)
             {
                 Varyings varyings = (Varyings)0;
@@ -106,11 +112,11 @@ Shader "Universal Render Pipeline/2D/SimpleSpriteShader"
 #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
                 int propertyIndex = _propertyPointers[instanceID];
                 float4 uvTilingAndOffset = _uvTilingAndOffsetBuffer[propertyIndex];
-                float sortingValue = _sortingValueBuffer[propertyIndex];
+                int2 sortingData = _sortingDataBuffer[propertyIndex];
                 int2 flipValue = _flipBuffer[propertyIndex];
 #else
                 float4 uvTilingAndOffset = float4(1, 1, 0, 0);
-                float sortingValue = 0;
+                int2 sortingData = int2(0, 0);
                 int2 flipValue = int2(0, 0);
 #endif
 
@@ -122,8 +128,16 @@ Shader "Universal Render Pipeline/2D/SimpleSpriteShader"
                 attributes.uv.y = flipValue.y >= 0 ? attributes.uv.y : (1.0 - attributes.uv.y);
 
                 // change SV_Position to sort instances on screen without changing theirs matrix depth value
+                float4 mvp3 = mul (UNITY_MATRIX_MVP, float4(0,0,0,1));
+                float2 screenClipSpacePos = mvp3.xy / mvp3.w;
                 varyings.positionCS = TransformObjectToHClip(attributes.positionOS);
-                varyings.positionCS.z = sortingValue;
+                
+                // here to sort [0..1] to SV_POSITION.z
+                // result value should account layer + sorint index + screen pos
+                varyings.positionCS.z =
+                    sortingData.x * _sortingGlobalData.x                                                                                // layer offset
+                    + sortingData.y * _sortingGlobalData.y                                                                              // sorting index offset
+                    + _sortingGlobalData.y * saturate(Remap(-1, 1, 0, 1, screenClipSpacePos.y));  // screen y pos offset
 
                 // tiling and offset UV
                 varyings.uv = TilingAndOffset(attributes.uv, uvTilingAndOffset.xy, uvTilingAndOffset.zw);
@@ -145,6 +159,7 @@ Shader "Universal Render Pipeline/2D/SimpleSpriteShader"
 
                 float4 texColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, varyings.uv);
                 clip(texColor.w - 0.5);
+
                 return texColor;
             }
             ENDHLSL

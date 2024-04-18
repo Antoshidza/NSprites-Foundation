@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using System;
+using Unity.Entities;
 using UnityEngine;
 
 namespace NSprites
@@ -17,12 +18,33 @@ namespace NSprites
                 return;
             }
 
-            baker.AddComponent<VisualSortingTag>(entity);
-            baker.AddComponent<SortingValue>(entity);
-            baker.AddComponent(entity, new SortingIndex { value = sortingIndex });
-            baker.AddSharedComponent(entity, new SortingLayer { index = sortingLayer });
-            if (staticSorting)
-                baker.AddComponent<SortingStaticTag>(entity);
+            if (sortingLayer < 0)
+            {
+                Debug.LogError(new ArgumentException($"Sorting layer index can't be less then zero, passed: {sortingLayer}"));
+                return;
+            }
+            
+            if(sortingLayer >= SpriteSortingSystem.LayerCount)
+            {
+                Debug.LogError(new ArgumentException(
+                    $"Sorting layer index can't be greater or equal to {nameof(SpriteSortingSystem.LayerCount)} defined in {nameof(SpriteSortingSystem)}, passed: {sortingLayer}"));
+                return;
+            }
+
+            if (sortingIndex < 0)
+            {
+                Debug.LogError(new ArgumentException($"Sorting index can't be less then zero, passed: {sortingIndex}"));
+                return;
+            }
+            
+            if(sortingIndex >= SpriteSortingSystem.SortingIndexCount)
+            {
+                Debug.LogError(new ArgumentException(
+                    $"Sorting index can't be greater or equal to {nameof(SpriteSortingSystem.SortingIndexCount)} defined in {nameof(SpriteSortingSystem)}, passed: {sortingIndex}"));
+                return;
+            }
+
+            baker.AddComponent(entity, new SortingData(sortingLayer, sortingIndex));
         }
     }
 }

@@ -17,7 +17,7 @@ MonoBehaviour:
     updateMode: 0
   - propertyName: _uvTilingAndOffsetBuffer
     updateMode: 0
-  - propertyName: _sortingValueBuffer
+  - propertyName: _sortingDataBuffer
     updateMode: 0
   - propertyName: _positionBuffer
     updateMode: 0
