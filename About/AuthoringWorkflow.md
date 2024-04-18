@@ -7,7 +7,7 @@ This package provides flexible authoring components that can serve your purposes
 The simplest way to use NSprites is to use ready monobehaviour authoring components from this package.
 These authoring components give you all of the data assignments you need in order to render sprites within the pipeline of this package.
 
-- [`SpriteRendererAuthoring`](../Base/Authoring/SpriteRendererAuthoring.cs) - bakes default render components. Adds [2D transform](2DTransform.md) components, removes default Unity 3D transforms, and adds sorting components.
+- [`SpriteRendererAuthoring`](../Base/Authoring/SpriteRendererAuthoring.cs) - bakes default render components + adds sorting components.
 - [`SpriteAnimatedRendererAuthoring`](../Animation/Authoring/SpriteAnimatedRendererAuthoring.cs) - same as previous, but also adds animation related components. Though not inherited from previous one (because it hard to keep all in place when you deal with unity serialization)
 
 ### Authoring Modules
