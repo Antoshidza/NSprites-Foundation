@@ -20,9 +20,6 @@ Also, before working with this package please read the [NSprites documentation](
 | [Animation](About/Animation.md)                                                           | runtime     | Shifts UV values to simulate sprite animation                                                                      |
 | Graphics                                                                                  | runtime     | Provides shaders / materials / other render assets                                                                 |
 
-The diagram below illustrates the dependencies between parts:
-<img src="About/NSprites-Foundation-Map.drawio.svg" width="800"/>
-
 ## Installation
 
 ### Requirements
