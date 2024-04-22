@@ -104,6 +104,11 @@ Shader "Universal Render Pipeline/2D/SimpleSpriteShader"
             {
                 return UV * Tiling + Offset;
             }
+
+            float RemapInternal(float value, float fromMin, float fromMax, float toMin, float toMax)
+            {
+                return toMin + (value - fromMin) * (toMax - toMin) / (fromMax - fromMin);
+            }
             
             Varyings UnlitVertex(Attributes attributes, uint instanceID : SV_InstanceID)
             {
@@ -137,7 +142,7 @@ Shader "Universal Render Pipeline/2D/SimpleSpriteShader"
                 varyings.positionCS.z =
                     sortingData.x * _sortingGlobalData.x                                                                                // layer offset
                     + sortingData.y * _sortingGlobalData.y                                                                              // sorting index offset
-                    + _sortingGlobalData.y * saturate(Remap(-1, 1, 0, 1, screenClipSpacePos.y));  // screen y pos offset
+                    + _sortingGlobalData.y * saturate(RemapInternal(-1, 1, 0, 1, screenClipSpacePos.y));  // screen y pos offset
 
                 // tiling and offset UV
                 varyings.uv = TilingAndOffset(attributes.uv, uvTilingAndOffset.xy, uvTilingAndOffset.zw);
