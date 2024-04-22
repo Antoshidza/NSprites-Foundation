@@ -1,6 +1,6 @@
 ﻿# Sorting
-Provides components / systems to perform 2D sorting based on [2D transforms](2DTransform.md) position relatively to camera view.
-Sorting happens inside shader, the only data passed to shader is `SortingData` with `int2` inside, where `x` is layer index and `y` is sorting index.
+Provides components / systems to perform 2D sorting based on position relatively to camera view.
+Sorting happens on GPU, the only data passed is `SortingData` with `int2` inside, where `x` is layer index and `y` is sorting index.
 
 Shader uses technique where `SV_Position.z` changes to make sprites visually by sorted depending on:
 * viewport y position
