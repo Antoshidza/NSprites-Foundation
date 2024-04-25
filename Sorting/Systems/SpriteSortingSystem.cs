@@ -6,7 +6,7 @@ namespace NSprites
 {
     [BurstCompile]
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
-    public partial struct SpriteSortingSystem : ISystemStartStop
+    public partial struct SpriteSortingSystem : ISystem
     {
         private static readonly int SortingGlobalData = Shader.PropertyToID("_sortingGlobalData");
 
@@ -16,10 +16,8 @@ namespace NSprites
         private const float PerLayerOffset = 1f / LayerCount;
         private const float PerSortingIndexOffset = PerLayerOffset / SortingIndexCount;
 
-        public void OnStartRunning(ref SystemState state) 
+        public void OnCreate(ref SystemState state) 
             => Shader.SetGlobalVector(SortingGlobalData, new Vector4(PerLayerOffset, PerSortingIndexOffset, default, default));
-
-        public void OnStopRunning(ref SystemState state) { }
     }
 }
 
