@@ -142,7 +142,7 @@ Shader "Universal Render Pipeline/2D/SimpleSpriteShader"
                 varyings.positionCS.z =
                     sortingData.x * _sortingGlobalData.x                                                                                // layer offset
                     + sortingData.y * _sortingGlobalData.y                                                                              // sorting index offset
-                    + _sortingGlobalData.y * saturate(RemapInternal(-1, 1, 0, 1, screenClipSpacePos.y));  // screen y pos offset
+                    + _sortingGlobalData.y * saturate(RemapInternal(screenClipSpacePos.y, -1, 1, 0, 1));  // screen y pos offset
 
                 // tiling and offset UV
                 varyings.uv = TilingAndOffset(attributes.uv, uvTilingAndOffset.xy, uvTilingAndOffset.zw);
