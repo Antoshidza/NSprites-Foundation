@@ -5,7 +5,7 @@ using Unity.Transforms;
 
 namespace NSprites
 {
-    [UpdateAfter(typeof(UpdateCullingDataSystem))]
+    // [UpdateAfter(typeof(UpdateCullingDataSystem))] // uncomment this if you use UpdateCullingDataSystem
     public partial struct FullScreenSpriteSystem : ISystem
     {
         [BurstCompile]
